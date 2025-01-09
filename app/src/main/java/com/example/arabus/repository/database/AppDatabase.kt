@@ -1,6 +1,18 @@
+package com.example.arabus.repository.database
+
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.arabus.repository.internal.dao.AccessibilityDao
+import com.example.arabus.repository.internal.dao.AddressDao
+import com.example.arabus.repository.internal.dao.BusDao
+import com.example.arabus.repository.internal.dao.FavoriteDao
+import com.example.arabus.repository.internal.dao.FeedbackDao
+import com.example.arabus.repository.internal.dao.HistoryDao
+import com.example.arabus.repository.internal.dao.ProfileDao
+import com.example.arabus.repository.internal.dao.RoleDao
+import com.example.arabus.repository.internal.dao.RouteDao
+import com.example.arabus.repository.internal.dao.UserDao
 import com.example.arabus.repository.internal.entities.Accessibility
 import com.example.arabus.repository.internal.entities.Address
 import com.example.arabus.repository.internal.entities.Bus

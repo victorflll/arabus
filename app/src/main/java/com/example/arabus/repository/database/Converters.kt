@@ -1,3 +1,5 @@
+package com.example.arabus.repository.database
+
 import androidx.room.TypeConverter
 import java.util.Date
 
