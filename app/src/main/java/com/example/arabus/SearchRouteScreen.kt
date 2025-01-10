@@ -36,6 +36,7 @@ import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -171,6 +172,10 @@ private fun BuildBody() {
 
 @Composable
 fun GoogleMapComposable() {
+    val defaultZoom = 13f
+    val lat = -9.7525
+    val lng = -36.6611
+
     val mapProperties = remember {
         MapProperties(
             isMyLocationEnabled = true
@@ -181,12 +186,20 @@ fun GoogleMapComposable() {
         MapUiSettings(zoomControlsEnabled = true)
     }
 
+    val city = LatLng(lat, lng)
+    val mapCamera = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(city, defaultZoom)
+    }
+
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         properties = mapProperties,
         uiSettings = uiSettings,
-        cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(LatLng(-9.7525, -36.6611), 13f)
+        cameraPositionState = mapCamera,
+        onMyLocationButtonClick = {
+            val movement = CameraUpdateFactory.newLatLngZoom(city, defaultZoom)
+            mapCamera.move(movement)
+            true
         }
     )
 }
