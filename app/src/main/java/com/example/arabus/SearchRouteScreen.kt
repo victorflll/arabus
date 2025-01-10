@@ -119,7 +119,11 @@ fun SearchRouteScreen(navController: NavHostController) {
                             )
                         }
                         Box(
-                            modifier = Modifier.clickable { println("Swap button clicked") }
+                            modifier = Modifier.clickable {
+                                val aux = origin.value
+                                origin.value = destination.value
+                                destination.value = aux
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.SwapVert,
