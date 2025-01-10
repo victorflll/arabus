@@ -16,7 +16,7 @@ import androidx.room.*
 data class Address(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "user_id") val userId: Int,
-    val neighborhood: String? = null,
-    val street: String? = null,
-    val postcode: String? = null
+    val neighborhood: String,
+    val street: String,
+    val postcode: String
 )

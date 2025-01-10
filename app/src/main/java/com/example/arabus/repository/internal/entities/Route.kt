@@ -13,8 +13,8 @@ data class Route(
     @ColumnInfo(name = "origin_longitude") val originLongitude: String,
     @ColumnInfo(name = "destination_latitude") val destinationLatitude: String,
     @ColumnInfo(name = "destination_longitude") val destinationLongitude: String,
-    @ColumnInfo(name = "started_at") val startedAt: Date? = null,
-    @ColumnInfo(name = "finished_at") val finishedAt: Date? = null,
+    @ColumnInfo(name = "started_at") val startedAt: Date,
+    @ColumnInfo(name = "finished_at") val finishedAt: Date,
     val cost: Double? = null,
     val available: Boolean = true
 )

@@ -15,7 +15,7 @@ import androidx.room.*
 )
 data class Profile(
     @PrimaryKey @ColumnInfo(name = "user_id") val userId: Int,
-    @ColumnInfo(name = "phone_number") val phoneNumber: String? = null,
+    @ColumnInfo(name = "phone_number") val phoneNumber: String,
     val name: String,
     val rating: Int? = null
 )

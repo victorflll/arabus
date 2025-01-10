@@ -19,7 +19,7 @@ data class User(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val email: String,
     val password: String,
-    @ColumnInfo(name = "role_id") val roleId: Int? = null,
-    @ColumnInfo(name = "created_at") val createdAt: Date? = null,
+    @ColumnInfo(name = "role_id") val roleId: Int,
+    @ColumnInfo(name = "created_at") val createdAt: Date,
     @ColumnInfo(name = "updated_at") val updatedAt: Date? = null
 )

@@ -16,7 +16,7 @@ import androidx.room.*
 data class Accessibility(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "user_id") val userId: Int,
-    val colorblind: Int? = null,
+    val colorblind: Boolean = false,
     @ColumnInfo(name = "one_handed") val oneHanded: Boolean = false,
     val contrast: Boolean = false,
     @ColumnInfo(name = "screen_reader") val screenReader: Boolean = false

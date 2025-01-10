@@ -25,5 +25,5 @@ data class Favorite(
     @ColumnInfo(name = "user_id") val userId: Int,
     @ColumnInfo(name = "route_id") val routeId: Int,
     val description: String? = null,
-    @ColumnInfo(name = "created_at") val createdAt: Date? = null
+    @ColumnInfo(name = "created_at") val createdAt: Date
 )
