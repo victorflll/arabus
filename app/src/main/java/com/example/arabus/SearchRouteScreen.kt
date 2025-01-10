@@ -35,6 +35,13 @@ import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
+import com.example.arabus.ui.utils.Permissions
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -133,12 +140,53 @@ fun SearchRouteScreen(navController: NavHostController) {
                         }
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                AppButton(
-                    title = "Verificar rotas",
-                    onClick = { println("Searching routes...") }
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    BuildBody()
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        AppButton(
+                            title = "Verificar rotas",
+                            onClick = { println("Searching routes...") }
+                        )
+                    }
+
+                }
             }
         }
     }
+}
+
+@Composable
+private fun BuildBody() {
+    //Permissions.RequestInternetPermission()
+    Permissions.RequestLocationPermission { GoogleMapComposable() }
+}
+
+@Composable
+fun GoogleMapComposable() {
+    val mapProperties = remember {
+        MapProperties(
+            isMyLocationEnabled = true
+        )
+    }
+
+    val uiSettings = remember {
+        MapUiSettings(zoomControlsEnabled = true)
+    }
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        properties = mapProperties,
+        uiSettings = uiSettings,
+        cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(LatLng(-9.7525, -36.6611), 13f)
+        }
+    )
 }
