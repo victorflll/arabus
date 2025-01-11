@@ -94,6 +94,7 @@ fun ViewRouteScreen(navController: NavHostController) {
                         rating = "4.$index",
                         logo = logo
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
