@@ -14,7 +14,9 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.arabus.ui.theme.AppWhite
 
@@ -26,22 +28,24 @@ private fun Preview(){
 }
 
 @Composable
-fun AppOriginToDestination() {
-    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+fun AppOriginToDestination(height: Dp = 24.dp, color: Color = AppWhite, thickness: Dp = 2.dp, modifier: Modifier = Modifier) {
+    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Icon(
             imageVector = Icons.Default.MyLocation,
             contentDescription = "Search Icon",
-            tint = AppWhite
+            tint = color,
+            modifier = Modifier.height(height)
         )
         VerticalDivider(
-            modifier = Modifier.height(24.dp),
-            thickness = 2.dp,
-            color = AppWhite
+            modifier = Modifier.height(height),
+            thickness = thickness,
+            color = color
         )
         Icon(
             imageVector = Icons.Outlined.LocationOn,
             contentDescription = "Search Icon",
-            tint = AppWhite
+            tint = color,
+            modifier = Modifier.height(height)
         )
     }
 }
