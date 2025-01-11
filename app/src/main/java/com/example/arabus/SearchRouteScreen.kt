@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,8 +27,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.components.AppTextField
@@ -154,7 +156,7 @@ fun SearchRouteScreen(navController: NavHostController) {
                     ) {
                         AppButton(
                             title = "Verificar rotas",
-                            onClick = { println("Searching routes...") }
+                            onClick = { navController.navigate(ViewRouteScreenPath) }
                         )
                     }
 
@@ -202,4 +204,10 @@ fun GoogleMapComposable() {
             true
         }
     )
+}
+
+@Composable
+@Preview
+private fun Preview() {
+    SearchRouteScreen(navController = NavHostController(LocalContext.current))
 }
