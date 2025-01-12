@@ -5,7 +5,7 @@ import com.example.arabus.repository.internal.entities.History
 
 @Dao
 interface HistoryDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(history: History)
 
     @Query("SELECT * FROM history WHERE user_id = :userId")
@@ -14,6 +14,4 @@ interface HistoryDao {
     @Query("SELECT * FROM history WHERE route_id = :routeId")
     suspend fun getByRouteId(routeId: Int): List<History>
 
-    @Delete
-    suspend fun delete(history: History)
 }

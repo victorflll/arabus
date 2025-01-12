@@ -23,6 +23,6 @@ data class Feedback(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "user_id") val userId: Int,
     val comment: String? = null,
-    val rating: Int? = null,
-    @ColumnInfo(name = "driver_id") val driverId: Int? = null
+    val rating: Int,
+    @ColumnInfo(name = "plate_license") val plateLicense: String
 )

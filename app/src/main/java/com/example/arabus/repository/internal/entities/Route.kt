@@ -9,6 +9,7 @@ import java.util.Date
 )
 data class Route(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @ColumnInfo(name = "route_code") val routeCode: String,
     @ColumnInfo(name = "origin_latitude") val originLatitude: String,
     @ColumnInfo(name = "origin_longitude") val originLongitude: String,
     @ColumnInfo(name = "destination_latitude") val destinationLatitude: String,
