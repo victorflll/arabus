@@ -11,12 +11,6 @@ import androidx.room.*
             childColumns = ["user_id"],
             onDelete = ForeignKey.CASCADE
         ),
-        ForeignKey(
-            entity = User::class,
-            parentColumns = ["id"],
-            childColumns = ["driver_id"],
-            onDelete = ForeignKey.CASCADE
-        )
     ]
 )
 data class Feedback(
