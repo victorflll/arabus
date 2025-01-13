@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.arabus.ui.HomeScreenPath
+import com.example.arabus.ui.LoginRouteScreen
 import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.components.AppButton
@@ -32,11 +33,12 @@ private fun App() {
 
     NavHost(
         navController = navController,
-        startDestination = HomeScreenPath
+        startDestination = LoginRouteScreen
     ) {
         composable(HomeScreenPath) { HomeScreen(navController) }
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
         composable(ViewRouteScreenPath) { ViewRouteScreen(navController) }
+        composable(LoginRouteScreen) { ViewLoginScreen(navController)}
     }
 }
 

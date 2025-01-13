@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
@@ -17,31 +17,31 @@ import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppGrey
 import com.example.arabus.ui.theme.AppWhite
 
-
 @Preview
 @Composable
-private fun Preview(){
+private fun Preview() {
     AppButton(
         title = "Title",
-        onClick = { println("Button clicked") }
+        onClick = { println("Button clicked") },
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
 @Composable
 fun AppButton(
     title: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
-        colors = ButtonColors(
+        colors = ButtonDefaults.buttonColors(
             containerColor = AppGreen,
             contentColor = AppWhite,
             disabledContainerColor = AppGrey,
             disabledContentColor = AppGreenOpacity
         ),
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .padding(16.dp)
             .height(48.dp)
     ) {
