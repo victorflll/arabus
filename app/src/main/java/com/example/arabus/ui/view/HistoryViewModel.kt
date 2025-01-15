@@ -7,6 +7,7 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.History
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class HistoryViewModel(application: Application) : AndroidViewModel(application) {
@@ -24,17 +25,17 @@ class HistoryViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun getHistoryByUserId(userId: Int, onResult: (List<History>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val historyList = historyDao.getByUserId(userId)
-            onResult(historyList)
+    suspend fun getHistoryByUserId(userId: Int): List<History> {
+        return withContext(Dispatchers.IO) {
+            historyDao.getByUserId(userId)
         }
     }
 
-    fun getHistoryByRouteId(routeId: Int, onResult: (List<History>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val historyList = historyDao.getByRouteId(routeId)
-            onResult(historyList)
+
+    suspend fun getHistoryByRouteId(routeId: Int): List<History> {
+        return withContext(Dispatchers.IO) {
+            historyDao.getByRouteId(routeId)
         }
     }
+
 }

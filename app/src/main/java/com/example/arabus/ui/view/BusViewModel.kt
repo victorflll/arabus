@@ -7,6 +7,7 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Bus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BusViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseInstance.getDatabase(application)
@@ -25,17 +26,15 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getBusById(licensePlate: String, onResult: (Bus?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val bus = busDao.getById(licensePlate)
-            onResult(bus)
+    suspend fun getBusById(licensePlate: String): Bus? {
+        return withContext(Dispatchers.IO) {
+            busDao.getById(licensePlate)
         }
     }
 
-    fun getBusByLicensePlate(licensePlate: String, onResult: (Bus?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val bus = busDao.getById(licensePlate)
-            onResult(bus)
+    suspend fun getBusByLicensePlate(licensePlate: String): Bus? {
+        return withContext(Dispatchers.IO) {
+            busDao.getById(licensePlate)
         }
     }
 
@@ -54,10 +53,10 @@ class BusViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getAllBuses(onResult: (List<Bus>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val buses = busDao.getAll()
-            onResult(buses)
+    suspend fun getAllBuses(): List<Bus> {
+        return withContext(Dispatchers.IO) {
+            busDao.getAll()
         }
     }
+
 }
