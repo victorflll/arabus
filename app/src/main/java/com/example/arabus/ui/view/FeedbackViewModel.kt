@@ -7,7 +7,6 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Feedback
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FeedbackViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseInstance.getDatabase(application)
@@ -25,17 +24,17 @@ class FeedbackViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    suspend fun getFeedbacksByUserId(userId: Int): List<Feedback> {
-        return withContext(Dispatchers.IO) {
-            feedbackDao.getByUserId(userId)
+    fun getFeedbacksByUserId(userId: Int, onResult: (List<Feedback>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val feedbacks = feedbackDao.getByUserId(userId)
+            onResult(feedbacks)
         }
     }
 
-
-    suspend fun getFeedbacksByPlateLicense(plateLicense: String): List<Feedback> {
-        return withContext(Dispatchers.IO) {
-            feedbackDao.getByDriverId(plateLicense)
+    fun getFeedbacksByPlateLicense(plateLicense: String, onResult: (List<Feedback>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val feedbacks = feedbackDao.getByDriverId(plateLicense)
+            onResult(feedbacks)
         }
     }
-
 }

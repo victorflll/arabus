@@ -7,16 +7,16 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Accessibility
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AccessibilityViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseInstance.getDatabase(application)
     private val accessibilityDao = database.accessibilityDao()
 
 
-    suspend fun getAccessibilityByUserId(userId: Int): Accessibility? {
-        return withContext(Dispatchers.IO) {
-            accessibilityDao.getByUserId(userId)
+    fun getAccessibilityByUserId(userId: Int, onResult: (Accessibility?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val settings = accessibilityDao.getByUserId(userId)
+            onResult(settings)
         }
     }
 

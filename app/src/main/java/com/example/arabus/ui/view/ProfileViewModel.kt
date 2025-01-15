@@ -8,7 +8,6 @@ import com.example.arabus.repository.internal.entities.Address
 import com.example.arabus.repository.internal.entities.Profile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,19 +28,20 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     }
 
-    suspend fun getAllProfiles(): List<Profile> {
-        return withContext(Dispatchers.IO) {
-            profileDao.getAll()
+    fun getAllProfiles(onResult: (List<Profile>) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO){
+            val profiles = profileDao.getAll()
+            onResult(profiles)
         }
+
     }
 
-
-    suspend fun getProfileById(userId: Int): Profile? {
-        return withContext(Dispatchers.IO) {
-            profileDao.getById(userId)
+    fun getProfileById(userId: Int, onResult: (Profile?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val profile = profileDao.getById(userId)
+            onResult(profile)
         }
     }
-
 
     fun updateProfile(userId: Int, name: String?, phoneNumber: String?, address: Address?) {
         viewModelScope.launch(Dispatchers.IO) {

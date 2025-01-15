@@ -7,7 +7,6 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Address
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AddressViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseInstance.getDatabase(application)
@@ -25,9 +24,10 @@ class AddressViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    suspend fun getAddressByUserId(userId: Int): Address? {
-        return withContext(Dispatchers.IO) {
-            addressDao.getByUserId(userId)
+    fun getAddressByUserId(userId: Int, onResult: (Address?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val address = addressDao.getByUserId(userId)
+            onResult(address)
         }
     }
 
