@@ -7,6 +7,7 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Favorite
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
@@ -25,12 +26,12 @@ class FavoriteViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun getFavoritesByUserId(userId: Int, onResult: (List<Favorite>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val favorites = favoriteDao.getByUserId(userId)
-            onResult(favorites)
+    suspend fun getFavoritesByUserId(userId: Int): List<Favorite> {
+        return withContext(Dispatchers.IO) {
+            favoriteDao.getByUserId(userId)
         }
     }
+
 
     fun updateFavorite(userId: Int, routeId: Int, newRouteId: Int?, description: String?) {
         viewModelScope.launch(Dispatchers.IO) {

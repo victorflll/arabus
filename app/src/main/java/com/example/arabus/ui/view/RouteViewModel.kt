@@ -7,6 +7,7 @@ import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Route
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class RouteViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,19 +41,19 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getRouteByCode(routeCode: String, onResult: (Route?) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val route = routeDao.getByCode(routeCode)
-            onResult(route)
+    suspend fun getRouteByCode(routeCode: String): Route? {
+        return withContext(Dispatchers.IO) {
+            routeDao.getByCode(routeCode)
         }
     }
 
-    fun getAllRoutes(onResult: (List<Route>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val routes = routeDao.getAvailableRoutes()
-            onResult(routes)
+
+    suspend fun getAllRoutes(): List<Route> {
+        return withContext(Dispatchers.IO) {
+            routeDao.getAvailableRoutes()
         }
     }
+
 
     fun updateRoute(
         routeCode: String,
