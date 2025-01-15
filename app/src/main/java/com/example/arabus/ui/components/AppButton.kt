@@ -1,5 +1,6 @@
 package com.example.arabus.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,7 +24,7 @@ private fun Preview() {
     AppButton(
         title = "Title",
         onClick = { println("Button clicked") },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 
@@ -31,7 +32,10 @@ private fun Preview() {
 fun AppButton(
     title: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = TextUnit(16f, TextUnitType.Sp),
+    padding: PaddingValues = PaddingValues(all = 16.dp)
+
 ) {
     Button(
         onClick = onClick,
@@ -42,9 +46,9 @@ fun AppButton(
             disabledContentColor = AppGreenOpacity
         ),
         modifier = modifier
-            .padding(16.dp)
+            .padding(padding)
             .height(48.dp)
     ) {
-        Text(text = title, fontSize = TextUnit(16f, TextUnitType.Sp))
+        Text(text = title, fontSize = fontSize)
     }
 }
