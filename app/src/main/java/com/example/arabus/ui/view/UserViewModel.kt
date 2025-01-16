@@ -8,6 +8,7 @@ import com.example.arabus.repository.internal.entities.User
 import com.example.arabus.ui.utils.Password
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,6 +39,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             val user = userDao.getById(userId)
             onResult(user)
+        }
+    }
+
+    suspend fun getUserByEmail(email: String): User? {
+        return withContext(Dispatchers.IO) {
+            userDao.getByEmail(email)
         }
     }
 

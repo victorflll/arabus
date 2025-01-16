@@ -17,6 +17,7 @@ import com.example.arabus.ui.LoginRouteScreen
 import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.components.AppButton
+import com.example.arabus.ui.view.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

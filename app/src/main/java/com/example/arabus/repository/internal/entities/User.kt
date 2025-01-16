@@ -4,7 +4,7 @@ import androidx.room.*
 import java.util.Date
 
 @Entity(
-    tableName = "user",
+    tableName = "com/example/arabus/application/service/user",
     foreignKeys = [
         ForeignKey(
             entity = Role::class,

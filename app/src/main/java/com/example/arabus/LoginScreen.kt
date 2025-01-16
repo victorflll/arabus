@@ -17,11 +17,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.arabus.application.service.user.AuthService
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
+import com.example.arabus.ui.view.UserViewModel
+import kotlinx.coroutines.launch
 
 private val LogoWidth = 200.dp
 private val LogoHeight = 85.dp
@@ -33,8 +37,13 @@ private val PaddingHorizontal = 16.dp
 
 @Composable
 fun ViewLoginScreen(navController: NavHostController) {
+    val userViewModel: UserViewModel = viewModel()
+    val authService = remember { AuthService(userViewModel) }
+
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
+    val isLoading = remember { mutableStateOf(false) }
+    val loginError = remember { mutableStateOf<String?>("") }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -58,8 +67,29 @@ fun ViewLoginScreen(navController: NavHostController) {
                     onUsernameChange = { username.value = it },
                     password = password.value,
                     onPasswordChange = { password.value = it },
-                    onForgotPasswordClick = { navController.navigate("home") },
-                    onLoginClick = { navController.navigate("search_route") }
+                    isLoading = isLoading.value,
+                    loginError = loginError.value,
+                    onForgotPasswordClick = { navController.navigate("forgot_password") },
+                    onLoginClick = {
+                        if (username.value.isBlank() || password.value.isBlank()) {
+                            loginError.value = "Preencha todos os campos."
+                        } else {
+                            isLoading.value = true
+                            loginError.value = ""
+
+                            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                                val isValid = authService.validateCredentials(username.value, password.value)
+
+                                if (isValid) {
+                                    navController.navigate("search_route")
+
+                                } else {
+                                    loginError.value = "Credenciais inválidas. Tente novamente."
+                                }
+                                isLoading.value = false
+                            }
+                        }
+                    }
                 )
             }
 
@@ -70,12 +100,15 @@ fun ViewLoginScreen(navController: NavHostController) {
         }
     }
 }
+
 @Composable
 fun LoginForm(
     username: String,
     onUsernameChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
+    isLoading: Boolean,
+    loginError: String?,
     onForgotPasswordClick: () -> Unit,
     onLoginClick: () -> Unit
 ) {
@@ -85,7 +118,7 @@ fun LoginForm(
     ) {
         LoadAsset.PngExtension("arabus-logo", width = LogoWidth, height = LogoHeight)
 
-        Spacer(modifier = Modifier.height(SpacingBetweenSections +  32.dp))
+        Spacer(modifier = Modifier.height(SpacingBetweenSections + 32.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -102,7 +135,7 @@ fun LoginForm(
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .align(Alignment.Start)
-                .padding(start = 14.dp, bottom = 16.dp)
+                .padding(start = 14.dp, bottom = PaddingHorizontal)
         )
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections))
@@ -128,16 +161,30 @@ fun LoginForm(
             isPassword = true
         )
 
-        AppButton(
-            title = "Esqueceu a senha?",
+        if (!loginError.isNullOrEmpty()) {
+            Text(
+                text = loginError,
+                color = Color.Red,
+                fontSize = SubtitleFontSize,
+                modifier = Modifier
+                    .align(Alignment.Start)
+                    .padding(top = 8.dp, start = 10.dp )
+            )
+        }
+
+        TextButton(
             onClick = onForgotPasswordClick,
-            padding = PaddingValues(all = 0.dp),
-            modifier = Modifier
-                .align(Alignment.End)
-        )
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text(
+                text = "Esqueceu a senha?",
+                fontSize = SubtitleFontSize,
+                color = Color.White
+            )
+        }
 
         AppButton(
-            title = "Login",
+            title = if (isLoading) "Aguarde..." else "Login",
             onClick = onLoginClick,
             fontSize = TitleFontSize,
             modifier = Modifier.fillMaxWidth(),
@@ -145,6 +192,8 @@ fun LoginForm(
         )
     }
 }
+
+
 
 @Composable
 fun SignupFooter(
