@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,13 +25,10 @@ import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.view.UserViewModel
 import kotlinx.coroutines.launch
 
-private val LogoWidth = 200.dp
-private val LogoHeight = 85.dp
-private val TitleFontSize = 26.sp
+private val TitleStyle = TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
 private val SubtitleFontSize = 16.sp
-private val LineHeight = 32.sp
 private val SpacingBetweenSections = 40.dp
-private val PaddingHorizontal = 16.dp
+private val HorizontalPadding = 16.dp
 
 @Composable
 fun ViewLoginScreen(navController: NavHostController) {
@@ -43,7 +38,9 @@ fun ViewLoginScreen(navController: NavHostController) {
     val username = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     val isLoading = remember { mutableStateOf(false) }
-    val loginError = remember { mutableStateOf<String?>("") }
+    val loginError = remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -52,7 +49,7 @@ fun ViewLoginScreen(navController: NavHostController) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(PaddingHorizontal),
+                .padding(HorizontalPadding),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -75,18 +72,15 @@ fun ViewLoginScreen(navController: NavHostController) {
                             loginError.value = "Preencha todos os campos."
                         } else {
                             isLoading.value = true
-                            loginError.value = ""
-
-                            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                            loginError.value = null
+                            coroutineScope.launch {
                                 val isValid = authService.validateCredentials(username.value, password.value)
-
                                 if (isValid) {
                                     navController.navigate("search_route")
-
                                 } else {
+                                    isLoading.value = false
                                     loginError.value = "Credenciais inválidas. Tente novamente."
                                 }
-                                isLoading.value = false
                             }
                         }
                     }
@@ -116,7 +110,7 @@ fun LoginForm(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoadAsset.PngExtension("arabus-logo", width = LogoWidth, height = LogoHeight)
+        LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections + 32.dp))
 
@@ -129,13 +123,12 @@ fun LoginForm(
                     append("siga com o login para o AraBus")
                 }
             },
-            fontSize = TitleFontSize,
+            style = TitleStyle,
             color = Color.White,
-            style = TextStyle(lineHeight = LineHeight),
             modifier = Modifier
                 .fillMaxWidth(0.7f)
                 .align(Alignment.Start)
-                .padding(start = 14.dp, bottom = PaddingHorizontal)
+                .padding(start = 14.dp, bottom = HorizontalPadding)
         )
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections))
@@ -168,7 +161,7 @@ fun LoginForm(
                 fontSize = SubtitleFontSize,
                 modifier = Modifier
                     .align(Alignment.Start)
-                    .padding(top = 8.dp, start = 10.dp )
+                    .padding(top = 8.dp, start = 10.dp)
             )
         }
 
@@ -186,14 +179,12 @@ fun LoginForm(
         AppButton(
             title = if (isLoading) "Aguarde..." else "Login",
             onClick = onLoginClick,
-            fontSize = TitleFontSize,
+            fontSize = TitleStyle.fontSize,
             modifier = Modifier.fillMaxWidth(),
             padding = PaddingValues(all = 0.dp)
         )
     }
 }
-
-
 
 @Composable
 fun SignupFooter(
