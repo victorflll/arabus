@@ -88,7 +88,7 @@ fun ViewLoginScreen(navController: NavHostController) {
             }
 
             SignupFooter(
-                onSignupClick = { navController.navigate("signup") },
+                onSignupClick = { navController.navigate("register_route") },
                 modifier = Modifier.align(Alignment.Start)
             )
         }
