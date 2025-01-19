@@ -55,13 +55,14 @@ private fun App() {
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
+    val textState = remember { mutableStateOf("") }
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
-            MapView()
+            MapView(textState)
             AppTextField(
                 placeholder = "Para onde vamos hoje?",
-                textState = "",
-                onValueChange = {},
+                textState = textState.value,
+                onValueChange = { textState.value = it },
                 modifier = Modifier.padding(32.dp),
                 trailingIcon = {
                     IconButton(onClick = { navController.navigate(SearchRouteScreenPath) }) {
@@ -74,25 +75,28 @@ fun HomeScreen(navController: NavHostController) {
 }
 
 @Composable
-fun MapView() {
+fun MapView(textState: MutableState<String>) {
     val initialPosition = LatLng(-9.754, -36.659)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialPosition, 14f)
     }
 
-    var markerPosition by remember { mutableStateOf(initialPosition) }
+    var markerPosition by remember { mutableStateOf<LatLng?>(null) }
 
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
         onMapClick = { latLng ->
             markerPosition = latLng
+            textState.value = "Lat: ${latLng.latitude}, Lng: ${latLng.longitude}"  // Preenche o input com a coordenada
         }
     ) {
-        Marker(
-            state = MarkerState(position = markerPosition),
-            title = "Ponto Selecionado",
-            snippet = "Novo Local"
-        )
+        markerPosition?.let {
+            Marker(
+                state = MarkerState(position = it),
+                title = "Ponto Selecionado",
+                snippet = "Lat: ${it.latitude}, Lng: ${it.longitude}"
+            )
+        }
     }
 }
