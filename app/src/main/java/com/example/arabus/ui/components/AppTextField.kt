@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import com.example.arabus.ui.theme.AppGrey
 import com.example.arabus.ui.theme.AppWhite
 
-
 @Preview
 @Composable
 private fun Preview(){
@@ -31,13 +30,14 @@ fun AppTextField(
     placeholder: String,
     textState: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = textState,
         onValueChange = onValueChange,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(8.dp)
             .background(AppWhite, shape = RoundedCornerShape(8.dp)),
