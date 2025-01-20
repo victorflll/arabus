@@ -76,7 +76,7 @@ fun ViewLoginScreen(navController: NavHostController) {
                             coroutineScope.launch {
                                 val isValid = authService.validateCredentials(username.value, password.value)
                                 if (isValid) {
-                                    navController.navigate("search_route")
+                                    navController.navigate("home")
                                 } else {
                                     isLoading.value = false
                                     loginError.value = "Credenciais inválidas. Tente novamente."
