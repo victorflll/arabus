@@ -40,6 +40,13 @@ android {
     buildFeatures {
         compose = true
     }
+    sourceSets {
+        getByName("main") {
+            assets {
+                srcDirs("src/main/assets")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -69,4 +76,11 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.material3)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.accompanist.permissions)
+    implementation(libs.coil.compose)
+    implementation(libs.bcrypt)
+
 }
