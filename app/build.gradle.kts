@@ -81,4 +81,6 @@ dependencies {
     implementation(libs.play.services.maps)
     implementation(libs.accompanist.permissions)
     implementation(libs.coil.compose)
+    implementation(libs.bcrypt)
+
 }
