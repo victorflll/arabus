@@ -8,3 +8,5 @@ val AppWhite = Color.White
 val AppBlack = Color.Black
 val AppRed = Color.Red
 val AppGrey = Color.Black.copy(alpha = 0.5f)
+val TypographyColor = Color(0xFF002733)
+val AppLightGrey = Color(0xFFD8E6EB)
