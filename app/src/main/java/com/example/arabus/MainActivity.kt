@@ -21,6 +21,7 @@ import com.example.arabus.ui.HistoryScreenPath
 import com.example.arabus.ui.HomeScreenPath
 import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.ViewRouteScreenPath
+import com.example.arabus.ui.NotificationScreenPath
 import com.example.arabus.ui.components.AppTextField
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -49,6 +50,7 @@ private fun App() {
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
         composable(ViewRouteScreenPath) { ViewRouteScreen(navController) }
         composable(HistoryScreenPath) { HistoryScreen(navController) }
+        composable(NotificationScreenPath) { NotificationScreen() }
     }
 }
 
