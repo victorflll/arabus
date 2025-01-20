@@ -37,7 +37,7 @@ import com.example.arabus.repository.internal.entities.User
         Accessibility::class,
         Feedback::class
     ],
-    version = 2
+    version = 1
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

@@ -2,7 +2,6 @@ package com.example.arabus.repository.internal.dao
 
 import androidx.room.*
 import com.example.arabus.repository.internal.entities.Address
-import com.example.arabus.repository.internal.entities.Favorite
 
 @Dao
 interface AddressDao {

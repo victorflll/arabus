@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
@@ -177,9 +178,9 @@ private fun BuildCard(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = fareInfo)
             }
-            AppButton("Visualizar") {
+            AppButton("Visualizar", onClick =  {
                 println("View button clicked for $routeName!")
-            }
+            })
         }
     }
 }

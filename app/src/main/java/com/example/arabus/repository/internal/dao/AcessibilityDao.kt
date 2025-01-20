@@ -2,7 +2,6 @@ package com.example.arabus.repository.internal.dao
 
 import androidx.room.*
 import com.example.arabus.repository.internal.entities.Accessibility
-import com.example.arabus.repository.internal.entities.Bus
 
 @Dao
 interface AccessibilityDao {

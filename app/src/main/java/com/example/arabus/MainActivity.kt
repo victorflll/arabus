@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.HistoryScreenPath
 import com.example.arabus.ui.HomeScreenPath
+import com.example.arabus.ui.LoginRouteScreen
 import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.NotificationScreenPath
@@ -29,6 +30,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.example.arabus.ui.components.AppButton
+import com.example.arabus.ui.view.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,13 +47,14 @@ private fun App() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = HomeScreenPath
+        startDestination = LoginRouteScreen
     ) {
         composable(HomeScreenPath) { HomeScreen(navController) }
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
         composable(ViewRouteScreenPath) { ViewRouteScreen(navController) }
         composable(HistoryScreenPath) { HistoryScreen(navController) }
         composable(NotificationScreenPath) { NotificationScreen() }
+        composable(LoginRouteScreen) { ViewLoginScreen(navController)}
     }
 }
 

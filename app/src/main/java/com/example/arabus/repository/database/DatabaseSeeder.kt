@@ -1,7 +1,7 @@
 import com.example.arabus.repository.database.AppDatabase
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
-import com.example.arabus.utils.PasswordUtil
+import com.example.arabus.ui.utils.Password
 import java.util.Date
 
 object DatabaseSeeder {
@@ -21,13 +21,13 @@ object DatabaseSeeder {
         val users = listOf(
             User(
                 email = "admin@gmail.com",
-                password = PasswordUtil.hashPassword("admin123"),
+                password = Password.hashPassword("admin123"),
                 roleId = 1,
                 createdAt = Date()
             ),
             User(
                 email = "user@gmail.com",
-                password = PasswordUtil.hashPassword("user123"),
+                password = Password.hashPassword("user123"),
                 roleId = 2,
                 createdAt = Date()
             )
