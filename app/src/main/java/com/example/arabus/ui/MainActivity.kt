@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,17 +12,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.arabus.components.AppScaffold
-import com.example.arabus.ui.HistoryScreenPath
-import com.example.arabus.ui.HomeScreenPath
-import com.example.arabus.ui.LoginRouteScreen
-import com.example.arabus.ui.SearchRouteScreenPath
-import com.example.arabus.ui.ViewRouteScreenPath
-import com.example.arabus.ui.NotificationScreenPath
 import com.example.arabus.ui.components.AppTextField
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -30,8 +26,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.example.arabus.ui.components.AppButton
-import com.example.arabus.ui.view.UserViewModel
+import com.example.arabus.ui.view.RouteViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +46,16 @@ private fun App() {
     ) {
         composable(HomeScreenPath) { HomeScreen(navController) }
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
-        composable(ViewRouteScreenPath) { ViewRouteScreen(navController) }
+        composable(ViewRouteScreenPath) {
+            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+            viewModelStoreOwner?.let { owner ->
+                val routeViewModel: RouteViewModel = viewModel(owner)
+                ViewRouteScreen(navController = navController, routeViewModel = routeViewModel)
+            }
+        }
         composable(HistoryScreenPath) { HistoryScreen(navController) }
         composable(NotificationScreenPath) { NotificationScreen() }
-        composable(LoginRouteScreen) { ViewLoginScreen(navController)}
+        composable(LoginRouteScreen) { ViewLoginScreen(navController) }
     }
 }
 
