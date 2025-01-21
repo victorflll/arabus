@@ -1,8 +1,13 @@
+package com.example.arabus
+
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
@@ -15,19 +20,26 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.application.service.user.AuthService
+import com.example.arabus.application.service.user.RegisterService
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.view.UserViewModel
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.components.AppButton
+import com.example.arabus.ui.view.ProfileViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val TitleStyle = TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
-private val SpacingBetweenSections = 40.dp
 private val DefaultPadding = 16.dp
+private val SubtitleFontSize = 16.sp
 
 @Composable
 fun ViewRegisterScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
-    val authService = remember { AuthService(userViewModel) }
+    val profileViewModel: ProfileViewModel = viewModel()
+    val registerService = remember { RegisterService(userViewModel, profileViewModel) }
 
     val fullName = remember { mutableStateOf("") }
     val phone = remember { mutableStateOf("") }
@@ -36,7 +48,23 @@ fun ViewRegisterScreen(navController: NavHostController) {
     val confirmPassword = remember { mutableStateOf("") }
 
     val isLoading = remember { mutableStateOf(false) }
-    val loginError = remember { mutableStateOf<String?>(null) }
+    val generalError = remember { mutableStateOf<String?>(null) }
+
+    fun validateFields(): Boolean {
+        if (fullName.value.isBlank() || phone.value.isBlank() || email.value.isBlank() ||
+            password.value.isBlank() || confirmPassword.value.isBlank()) {
+            generalError.value = "Por favor, preencha todos os campos."
+            return false
+        }
+
+        if (password.value != confirmPassword.value) {
+            generalError.value = "As senhas não coincidem."
+            return false
+        }
+
+        generalError.value = null
+        return true
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -47,7 +75,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .statusBarsPadding()
                 .padding(DefaultPadding),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -67,10 +95,10 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     color = Color.White,
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
-                        .padding(start = 14.dp, bottom = DefaultPadding)
+                        .padding(start = 14.dp, bottom = 10.dp)
                 )
 
-                Spacer(modifier = Modifier.height(SpacingBetweenSections))
+                Spacer(modifier = Modifier.height(DefaultPadding))
 
                 AppTextField(
                     placeholder = "Nome completo",
@@ -80,7 +108,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     labelColor = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(bottom = 6.dp)
                 )
 
                 AppTextField(
@@ -91,7 +119,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     labelColor = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(bottom = 6.dp)
                 )
 
                 AppTextField(
@@ -102,7 +130,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     labelColor = Color.White,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(bottom = 6.dp)
                 )
 
                 AppTextField(
@@ -111,9 +139,10 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     textState = password.value,
                     onValueChange = { password.value = it },
                     labelColor = Color.White,
+                    isPassword = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(bottom = 6.dp)
                 )
 
                 AppTextField(
@@ -122,18 +151,88 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     textState = confirmPassword.value,
                     onValueChange = { confirmPassword.value = it },
                     labelColor = Color.White,
+                    isPassword = true,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp)
+                        .padding(bottom = 0.dp)
                 )
+
+                generalError.value?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 0.dp)
+                    )
+                }
+
                 AppButton(
                     title = if (isLoading.value) "Aguarde..." else "Cadastrar",
                     fontSize = 24.sp,
                     modifier = Modifier.fillMaxWidth(),
                     padding = PaddingValues(all = 0.dp),
-                    onClick = {}
+                    onClick = {
+                        if (validateFields()) {
+                            isLoading.value = true
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    registerService.registerUser(
+                                        fullName.value,
+                                        phone.value,
+                                        email.value,
+                                        password.value
+                                    )
+
+                                    withContext(Dispatchers.Main) {
+                                        isLoading.value = false
+                                        navController.navigate("login_route")
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        isLoading.value = false
+                                        generalError.value = "Algo deu errado! Tente novamente"
+                                    }
+                                }
+                            }
+                        }
+                    }
                 )
             }
+            LoginFooter(
+                onSignupClick = { navController.navigate("login_route") },
+                modifier = Modifier.align(Alignment.Start)
+            )
         }
     }
 }
+
+
+
+@Composable
+fun LoginFooter(
+    onSignupClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 14.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Já possui uma conta?",
+            fontSize = SubtitleFontSize,
+            color = Color.White
+        )
+        TextButton(onClick = onSignupClick) {
+            Text(
+                text = "Entre aqui",
+                fontSize = SubtitleFontSize,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+        }
+    }
+}
+

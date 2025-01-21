@@ -14,15 +14,4 @@ class AuthService(private val userViewModel: UserViewModel) {
             Password.verifyPassword(password, user.password)
         }
     }
-
-    suspend fun registerUser(email: String, password: String, roleId: Int): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                userViewModel.insertUser(email, password, roleId)
-                true
-            } catch (e: Exception) {
-                false
-            }
-        }
-    }
 }

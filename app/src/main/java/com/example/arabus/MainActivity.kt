@@ -23,6 +23,7 @@ import com.example.arabus.ui.LoginRouteScreen
 import com.example.arabus.ui.SearchRouteScreenPath
 import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.NotificationScreenPath
+import com.example.arabus.ui.RegisterRouteScreen
 import com.example.arabus.ui.components.AppTextField
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -30,8 +31,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.example.arabus.ui.components.AppButton
-import com.example.arabus.ui.view.UserViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +54,7 @@ private fun App() {
         composable(HistoryScreenPath) { HistoryScreen(navController) }
         composable(NotificationScreenPath) { NotificationScreen() }
         composable(LoginRouteScreen) { ViewLoginScreen(navController)}
+        composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
     }
 }
 

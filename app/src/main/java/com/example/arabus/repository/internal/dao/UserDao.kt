@@ -7,7 +7,7 @@ import com.example.arabus.repository.internal.entities.User
 @Dao
 interface UserDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(user: User)
+    suspend fun insert(user: User): Long
 
     @Query("SELECT * FROM user WHERE id = :userId")
     suspend fun getById(userId: Int): User?
