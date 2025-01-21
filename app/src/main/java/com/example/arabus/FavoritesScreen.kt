@@ -2,65 +2,66 @@ package com.example.arabus
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.*
+import com.example.arabus.ui.utils.LoadAsset
 
 @Composable
 fun FavoritesScreen() {
-    ArabusTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(36.dp))
-                FavoritesHeader()
-                Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(36.dp))
+            FavoritesHeader()
+            Spacer(modifier = Modifier.height(20.dp))
 
-                val favoriteRoutes = listOf(
-                    FavoriteRoute(
-                        startTime = "05:20",
-                        startLocation = "Cirilo José, Boa Vista",
-                        duration = "40min",
-                        endTime = "06:00",
-                        endLocation = "Terminal Ceci Cunha",
-                        price = "R$ 3,50",
-                        logoResource = R.drawable.real_arapiraca_logo,
-                        line = "221 - Pau D’arco",
-                        rating = "4.9"
-                    ),
-                    FavoriteRoute(
-                        startTime = "12:30",
-                        startLocation = "Terminal Ceci Cunha",
-                        duration = "30min",
-                        endTime = "13:00",
-                        endLocation = "IFAL - Campus Arapiraca",
-                        price = "Sem tarifa",
-                        logoResource = R.drawable.metropolitana_logo,
-                        line = "003 - Poção",
-                        rating = "4.5"
-                    )
+            val favoriteRoutes = listOf(
+                FavoriteRoute(
+                    startTime = "05:20",
+                    endTime = "06:00",
+                    startLocation = "Cirilo José, Boa Vista",
+                    endLocation = "Terminal Ceci Cunha",
+                    duration = "40min",
+                    price = "R$ 3,50",
+                    logo = "real-logo",
+                    line = "221 - Pau D’arco",
+                    rating = "4.9"
+                ),
+                FavoriteRoute(
+                    startTime = "12:30",
+                    endTime = "13:00",
+                    startLocation = "Terminal Ceci Cunha",
+                    endLocation = "IFAL - Campus Arapiraca",
+                    duration = "30min",
+                    price = "Sem tarifa",
+                    logo = "metropolitana-logo",
+                    line = "003 - Poção",
+                    rating = "4.5"
                 )
+            )
 
-                favoriteRoutes.forEach { route ->
+            LazyColumn {
+                items(favoriteRoutes) { route ->
                     FavoriteRouteCard(route)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
@@ -73,11 +74,11 @@ fun FavoritesScreen() {
 fun FavoritesHeader() {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_heart),
+            imageVector = Icons.Outlined.FavoriteBorder,
             contentDescription = "Ícone de favoritos",
             modifier = Modifier
                 .padding(start = 26.dp)
-                .size(28.dp),
+                .size(32.dp),
             tint = TypographyColor
         )
         Spacer(modifier = Modifier.width(12.dp))
@@ -91,126 +92,62 @@ fun FavoritesHeader() {
 @Composable
 fun FavoriteRouteCard(route: FavoriteRoute) {
     Card(
+        colors = CardDefaults.cardColors(containerColor = AppGreenOpacity),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = AppLightGrey),
-        border = BorderStroke(2.dp, AppGreen)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        border = BorderStroke(1.dp, AppBlack)
     ) {
-        Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TimeColumn(route)
-                Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.padding(16.dp, 12.dp, 16.dp, 8.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column {
+                    Text(text = route.startTime)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = route.endTime)
+                }
                 AppOriginToDestination(
-                    height = 30.dp,
-                    color = TypographyColor,
+                    height = 18.dp,
+                    color = AppBlack,
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                AddressAndPriceColumn(route)
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            LogoAndRatingRow(route)
-        }
-    }
-}
-
-@Composable
-fun TimeColumn(route: FavoriteRoute) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(30.dp),
-        modifier = Modifier.padding(end = 8.dp)
-    ) {
-        Text(
-            text = route.startTime,
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = TypographyColor,
-                fontWeight = FontWeight.Bold
-            )
-        )
-        Text(
-            text = route.endTime,
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = TypographyColor,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
-}
-
-@Composable
-fun AddressAndPriceColumn(route: FavoriteRoute) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(end = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = route.startLocation,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = TypographyColor,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .weight(1f, fill = false),
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = route.price,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = TypographyColor,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = route.endLocation,
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = TypographyColor,
-                fontWeight = FontWeight.Bold
-            ),
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-
-@Composable
-fun LogoAndRatingRow(route: FavoriteRoute) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            painter = painterResource(id = route.logoResource),
-            contentDescription = "Logo da empresa",
-            modifier = Modifier.size(64.dp),
-            tint = Color.Unspecified
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column {
-            Text(
-                text = route.line,
-                style = MaterialTheme.typography.bodySmall.copy(color = TypographyColor),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Filled.Star,
-                    contentDescription = "Estrela",
-                    modifier = Modifier.size(14.dp),
-                    tint = TypographyColor
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = route.startLocation)
+                    Text(
+                        text = route.duration,
+                        fontSize = TextUnit(10f, TextUnitType.Sp),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                    Text(text = route.endLocation)
+                }
                 Text(
-                    text = route.rating,
-                    style = MaterialTheme.typography.bodySmall.copy(color = TypographyColor)
+                    text = route.price,
+                    fontSize = TextUnit(12f, TextUnitType.Sp),
+                    modifier = Modifier.padding(start = 8.dp)
                 )
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                LoadAsset.PngExtension(route.logo, width = 84.dp, height = 84.dp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(horizontalAlignment = Alignment.Start) {
+                    Text(text = route.line)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        Icon(
+                            imageVector = Icons.Outlined.Star,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(text = route.rating)
+                    }
+                }
             }
         }
     }
@@ -218,12 +155,18 @@ fun LogoAndRatingRow(route: FavoriteRoute) {
 
 data class FavoriteRoute(
     val startTime: String,
-    val startLocation: String,
-    val duration: String,
     val endTime: String,
+    val startLocation: String,
     val endLocation: String,
+    val duration: String,
     val price: String,
-    val logoResource: Int,
+    val logo: String,
     val line: String,
     val rating: String
 )
+
+@Composable
+@Preview(showBackground = true)
+fun FavoritesScreenPreview() {
+    FavoritesScreen()
+}
