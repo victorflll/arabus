@@ -18,6 +18,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.arabus.HistoryScreenPath
+import com.example.arabus.HomeScreenPath
+import com.example.arabus.LoginRouteScreen
+import com.example.arabus.NotificationScreenPath
+import com.example.arabus.SearchRouteScreenPath
+import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppTextField
 import com.google.android.gms.maps.model.CameraPosition

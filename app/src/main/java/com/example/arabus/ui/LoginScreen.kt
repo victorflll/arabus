@@ -1,10 +1,23 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +38,8 @@ import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.view.UserViewModel
 import kotlinx.coroutines.launch
 
-private val TitleStyle = TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
+private val TitleStyle =
+    TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
 private val SubtitleFontSize = 16.sp
 private val SpacingBetweenSections = 40.dp
 private val HorizontalPadding = 16.dp
@@ -35,8 +49,8 @@ fun ViewLoginScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
     val authService = remember { AuthService(userViewModel) }
 
-    val username = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
+    val username = remember { mutableStateOf("admin@gmail.com") }
+    val password = remember { mutableStateOf("admin123") }
     val isLoading = remember { mutableStateOf(false) }
     val loginError = remember { mutableStateOf<String?>(null) }
 
@@ -74,7 +88,8 @@ fun ViewLoginScreen(navController: NavHostController) {
                             isLoading.value = true
                             loginError.value = null
                             coroutineScope.launch {
-                                val isValid = authService.validateCredentials(username.value, password.value)
+                                val isValid =
+                                    authService.validateCredentials(username.value, password.value)
                                 if (isValid) {
                                     navController.navigate("home")
                                 } else {
@@ -176,13 +191,21 @@ fun LoginForm(
             )
         }
 
-        AppButton(
-            title = if (isLoading) "Aguarde..." else "Login",
-            onClick = onLoginClick,
-            fontSize = TitleStyle.fontSize,
-            modifier = Modifier.fillMaxWidth(),
-            padding = PaddingValues(all = 0.dp)
-        )
+        if (isLoading) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            AppButton(
+                title = "Login",
+                onClick = onLoginClick,
+                fontSize = TitleStyle.fontSize,
+                modifier = Modifier.fillMaxWidth(),
+                padding = PaddingValues(all = 0.dp)
+            )
+        }
     }
 }
 
