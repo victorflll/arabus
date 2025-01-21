@@ -66,6 +66,7 @@ fun AppTextField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(8.dp)
                 .background(AppWhite, shape = RoundedCornerShape(8.dp)),
             placeholder = { Text(text = placeholder, color = AppGrey) },
             shape = RoundedCornerShape(8.dp),
