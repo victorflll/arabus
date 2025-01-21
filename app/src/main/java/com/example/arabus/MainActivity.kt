@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.ui.FavoritesScreenPath
 import com.example.arabus.ui.HistoryScreenPath
 import com.example.arabus.ui.HomeScreenPath
 import com.example.arabus.ui.LoginRouteScreen
@@ -52,6 +53,7 @@ private fun App() {
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
         composable(ViewRouteScreenPath) { ViewRouteScreen(navController) }
         composable(HistoryScreenPath) { HistoryScreen(navController) }
+        composable(FavoritesScreenPath) { FavoritesScreen() }
         composable(NotificationScreenPath) { NotificationScreen() }
         composable(LoginRouteScreen) { ViewLoginScreen(navController)}
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }

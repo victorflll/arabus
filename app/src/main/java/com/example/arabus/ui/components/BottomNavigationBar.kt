@@ -21,7 +21,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick = {},
+           onClick = {navController.navigate("favorite")},
             icon = { androidx.compose.material3.Icon(Icons.Default.Favorite, contentDescription = "Favoritos") },
             label = { androidx.compose.material3.Text("Favoritos") }
         )

@@ -46,7 +46,8 @@ fun AppButton(
             disabledContentColor = AppGreenOpacity
         ),
         modifier = modifier
-            .padding(padding)
+            .fillMaxWidth()
+            .padding(16.dp)
             .height(48.dp)
     ) {
         Text(text = title, fontSize = fontSize)
