@@ -1,8 +1,8 @@
-package com.example.arabus.utils
+package com.example.arabus.ui.utils
 
 import org.mindrot.jbcrypt.BCrypt
 
-object PasswordUtil {
+object Password {
     fun hashPassword(password: String): String {
         return BCrypt.hashpw(password, BCrypt.gensalt())
     }

@@ -27,7 +27,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick = {},
+            onClick = {navController.navigate("notifications")},
             icon = { androidx.compose.material3.Icon(Icons.Default.Notifications, contentDescription = "Notificações") },
             label = { androidx.compose.material3.Text("Notificações") }
         )

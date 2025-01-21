@@ -5,9 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.User
-import com.example.arabus.utils.PasswordUtil
+import com.example.arabus.ui.utils.Password
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
@@ -18,7 +19,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             val now = Date()
             val user = User(
                 email = email,
-                password = PasswordUtil.hashPassword(password),
+                password = Password.hashPassword(password),
                 roleId = roleId,
                 createdAt = now,
                 updatedAt = now
@@ -41,6 +42,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    suspend fun getUserByEmail(email: String): User? {
+        return withContext(Dispatchers.IO) {
+            userDao.getByEmail(email)
+        }
+    }
+
     fun updateUser(userId: Int, email: String, password: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val existingUser = userDao.getById(userId)
@@ -55,7 +62,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 val newPassword = password ?: existingUser.password
 
                 val updatedUser = existingUser.copy(
-                    password = PasswordUtil.hashPassword(newPassword),
+                    password = Password.hashPassword(newPassword),
                     updatedAt = now
                 )
                 userDao.update(updatedUser)
