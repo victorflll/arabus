@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.arabus.ui.ViewRouteScreenPath
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.components.AppTextField
