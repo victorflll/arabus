@@ -1,4 +1,4 @@
-package com.example.arabus.ui
+package com.example.arabus
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -60,6 +60,7 @@ private fun App() {
             }
         }
         composable(HistoryScreenPath) { HistoryScreen(navController) }
+        composable(FavoritesScreenPath) { FavoritesScreen() }
         composable(NotificationScreenPath) { NotificationScreen() }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
     }
