@@ -1,6 +1,5 @@
 package com.example.arabus
 
-
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
@@ -19,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.application.service.user.AuthService
 import com.example.arabus.application.service.user.RegisterService
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.view.UserViewModel
@@ -31,7 +29,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private val TitleStyle = TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
+private val TitleStyle = TextStyle(
+    fontSize = 26.sp,
+    lineHeight = 32.sp,
+    fontWeight = FontWeight.Bold
+)
 private val DefaultPadding = 16.dp
 private val SubtitleFontSize = 16.sp
 
@@ -51,19 +53,32 @@ fun ViewRegisterScreen(navController: NavHostController) {
     val generalError = remember { mutableStateOf<String?>(null) }
 
     fun validateFields(): Boolean {
-        if (fullName.value.isBlank() || phone.value.isBlank() || email.value.isBlank() ||
-            password.value.isBlank() || confirmPassword.value.isBlank()) {
-            generalError.value = "Por favor, preencha todos os campos."
-            return false
+        return when {
+            fullName.value.isBlank() -> {
+                generalError.value = "Por favor, preencha o campo Nome completo."
+                false
+            }
+            phone.value.isBlank() -> {
+                generalError.value = "Por favor, preencha o campo Telefone."
+                false
+            }
+            email.value.isBlank() -> {
+                generalError.value = "Por favor, preencha o campo E-mail."
+                false
+            }
+            password.value.isBlank() || confirmPassword.value.isBlank() -> {
+                generalError.value = "Por favor, preencha os campos de senha."
+                false
+            }
+            password.value != confirmPassword.value -> {
+                generalError.value = "As senhas não coincidem."
+                false
+            }
+            else -> {
+                generalError.value = null
+                true
+            }
         }
-
-        if (password.value != confirmPassword.value) {
-            generalError.value = "As senhas não coincidem."
-            return false
-        }
-
-        generalError.value = null
-        return true
     }
 
     Surface(
@@ -75,129 +90,50 @@ fun ViewRegisterScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .statusBarsPadding()
                 .padding(DefaultPadding),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(DefaultPadding)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-            ) {
-                Text(
-                    text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append("Seja bem-vindo, ")
-                        }
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
-                            append("crie sua conta aqui e ande com o Arabus")
-                        }
-                    },
-                    style = TitleStyle,
-                    color = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .padding(start = 14.dp, bottom = 10.dp)
-                )
+            Header()
 
-                Spacer(modifier = Modifier.height(DefaultPadding))
+            RegistrationForm(
+                fullName = fullName,
+                phone = phone,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                generalError = generalError
+            )
 
-                AppTextField(
-                    placeholder = "Nome completo",
-                    label = "Nome completo",
-                    textState = fullName.value,
-                    onValueChange = { fullName.value = it },
-                    labelColor = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp)
-                )
-
-                AppTextField(
-                    placeholder = "Telefone",
-                    label = "Telefone",
-                    textState = phone.value,
-                    onValueChange = { phone.value = it },
-                    labelColor = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp)
-                )
-
-                AppTextField(
-                    placeholder = "E-mail",
-                    label = "E-mail",
-                    textState = email.value,
-                    onValueChange = { email.value = it },
-                    labelColor = Color.White,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp)
-                )
-
-                AppTextField(
-                    placeholder = "Senha",
-                    label = "Senha",
-                    textState = password.value,
-                    onValueChange = { password.value = it },
-                    labelColor = Color.White,
-                    isPassword = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 6.dp)
-                )
-
-                AppTextField(
-                    placeholder = "Confirmar senha",
-                    label = "Confirmar senha",
-                    textState = confirmPassword.value,
-                    onValueChange = { confirmPassword.value = it },
-                    labelColor = Color.White,
-                    isPassword = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 0.dp)
-                )
-
-                generalError.value?.let {
-                    Text(
-                        text = it,
-                        color = Color.Red,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 0.dp)
-                    )
-                }
-
-                AppButton(
-                    title = if (isLoading.value) "Aguarde..." else "Cadastrar",
-                    fontSize = 24.sp,
-                    modifier = Modifier.fillMaxWidth(),
-                    padding = PaddingValues(all = 0.dp),
-                    onClick = {
-                        if (validateFields()) {
-                            isLoading.value = true
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    registerService.registerUser(
-                                        fullName.value,
-                                        phone.value,
-                                        email.value,
-                                        password.value
-                                    )
-
-                                    withContext(Dispatchers.Main) {
-                                        isLoading.value = false
-                                        navController.navigate("login_route")
-                                    }
-                                } catch (e: Exception) {
-                                    withContext(Dispatchers.Main) {
-                                        isLoading.value = false
-                                        generalError.value = "Algo deu errado! Tente novamente"
-                                    }
+            AppButton(
+                title = if (isLoading.value) "Aguarde..." else "Cadastrar",
+                fontSize = 24.sp,
+                modifier = Modifier.fillMaxWidth(),
+                padding = PaddingValues(0.dp),
+                onClick = {
+                    if (validateFields()) {
+                        isLoading.value = true
+                        CoroutineScope(Dispatchers.IO).launch {
+                            try {
+                                registerService.registerUser(
+                                    fullName.value,
+                                    phone.value,
+                                    email.value,
+                                    password.value
+                                )
+                                withContext(Dispatchers.Main) {
+                                    isLoading.value = false
+                                    navController.navigate("login_route")
+                                }
+                            } catch (e: Exception) {
+                                withContext(Dispatchers.Main) {
+                                    isLoading.value = false
+                                    generalError.value = "Algo deu errado! Tente novamente."
                                 }
                             }
                         }
                     }
-                )
-            }
+                }
+            )
+
             LoginFooter(
                 onSignupClick = { navController.navigate("login_route") },
                 modifier = Modifier.align(Alignment.Start)
@@ -206,7 +142,85 @@ fun ViewRegisterScreen(navController: NavHostController) {
     }
 }
 
-
+@Composable
+private fun Header() {
+    Text(
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Seja bem-vindo, ")
+            }
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Normal)) {
+                append("crie sua conta aqui e ande com o Arabus")
+            }
+        },
+        style = TitleStyle,
+        color = Color.White,
+        modifier = Modifier
+            .fillMaxWidth(0.7f)
+            .padding(start = 14.dp, bottom = 10.dp)
+    )
+}
+@Composable
+private fun RegistrationForm(
+    fullName: MutableState<String>,
+    phone: MutableState<String>,
+    email: MutableState<String>,
+    password: MutableState<String>,
+    confirmPassword: MutableState<String>,
+    generalError: MutableState<String?>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        AppTextField(
+            placeholder = "Nome completo",
+            label = "Nome completo",
+            textState = fullName.value,
+            onValueChange = { fullName.value = it },
+            labelColor = Color.White
+        )
+        AppTextField(
+            placeholder = "Telefone",
+            label = "Telefone",
+            textState = phone.value,
+            onValueChange = { phone.value = it },
+            labelColor = Color.White
+        )
+        AppTextField(
+            placeholder = "E-mail",
+            label = "E-mail",
+            textState = email.value,
+            onValueChange = { email.value = it },
+            labelColor = Color.White
+        )
+        AppTextField(
+            placeholder = "Senha",
+            label = "Senha",
+            textState = password.value,
+            onValueChange = { password.value = it },
+            labelColor = Color.White,
+            isPassword = true
+        )
+        AppTextField(
+            placeholder = "Confirmar senha",
+            label = "Confirmar senha",
+            textState = confirmPassword.value,
+            onValueChange = { confirmPassword.value = it },
+            labelColor = Color.White,
+            isPassword = true
+        )
+        generalError.value?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 6.dp)
+            )
+        }
+    }
+}
 
 @Composable
 fun LoginFooter(
@@ -235,4 +249,3 @@ fun LoginFooter(
         }
     }
 }
-
