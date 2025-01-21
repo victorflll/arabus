@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import com.example.arabus.R
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
