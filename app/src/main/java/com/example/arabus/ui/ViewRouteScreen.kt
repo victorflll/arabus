@@ -103,7 +103,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                     Text("Nenhuma rota disponível.")
                 }
             } else {
-                LazyColumn(modifier = Modifier.padding(16.dp)) {
+                LazyColumn(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
                     items(routes.size) { i ->
                         val route = routes[i].route
                         val address = routes[i]
@@ -144,13 +144,12 @@ private fun BuildCard(
             containerColor = AppGreenOpacity,
             contentColor = AppBlack,
         ),
-        modifier = Modifier.padding(vertical = 8.dp),
         border = BorderStroke(1.dp, AppBlack)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 LoadAsset.PngExtension(logo)
@@ -194,7 +193,7 @@ private fun BuildCard(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(text = fareInfo)
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             AppButton("Visualizar", onClick = {
                 println("View button clicked for $routeName!")
             })
