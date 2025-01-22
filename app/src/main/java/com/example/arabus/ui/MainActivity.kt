@@ -24,15 +24,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.arabus.FavoritesScreen
 import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.HistoryScreenPath
 import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
+import com.example.arabus.NotificationScreen
 import com.example.arabus.NotificationScreenPath
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppTextField
+import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.RouteViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -66,9 +69,21 @@ private fun App() {
                 ViewRouteScreen(navController = navController, routeViewModel = routeViewModel)
             }
         }
-        composable(HistoryScreenPath) { HistoryScreen(navController) }
-        composable(FavoritesScreenPath) { FavoritesScreen() }
-        composable(NotificationScreenPath) { NotificationScreen() }
+        composable(HistoryScreenPath) {
+            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+            viewModelStoreOwner?.let { owner ->
+                val routeViewModel: RouteViewModel = viewModel(owner)
+                val historyViewModel: HistoryViewModel = viewModel(owner)
+                HistoryScreen(
+                    navController = navController,
+                    routeViewModel = routeViewModel,
+                    historyViewModel = historyViewModel
+                )
+            }
+        }
+
+        composable(FavoritesScreenPath) { FavoritesScreen(navController) }
+        composable(NotificationScreenPath) { NotificationScreen(navController) }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
     }
 }

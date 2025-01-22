@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,8 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.repository.internal.entities.History
+import com.example.arabus.repository.internal.entities.Route
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
 import com.example.arabus.ui.theme.AppGreen
@@ -40,10 +50,29 @@ import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppGrey
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.LoadAsset
-
+import com.example.arabus.ui.utils.timeDifference
+import com.example.arabus.ui.utils.toFormattedTime
+import com.example.arabus.ui.view.HistoryViewModel
+import com.example.arabus.ui.view.RouteViewModel
+import android.util.Log
 @OptIn(ExperimentalMaterial3Api::class)
+
+
 @Composable
-fun HistoryScreen(navController: NavHostController) {
+fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewModel, historyViewModel: HistoryViewModel) {
+    val userMockId = 1
+    val routes by routeViewModel.routes.collectAsState()
+
+    var history by rememberSaveable { mutableStateOf<List<History>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        historyViewModel.getHistoryByUserId(userMockId) { historyList ->
+            Log.d("HistoryScreen", "History loaded: ${historyList.size} items")
+            history = historyList
+        }
+        routeViewModel.loadRoutes()
+    }
+
     AppScaffold(
         navController = navController,
         topBar = {
@@ -75,23 +104,25 @@ fun HistoryScreen(navController: NavHostController) {
                 .padding(innerPadding)
         ) {
             LazyColumn {
-                items(5) { index ->
-                    val logo: String = if (index % 2 == 0) {
-                        "metropolitana-logo"
+                items(history.size) { index ->
+                    val historyItem = history[index]
+                    val routeItem = routes.find { it.route.routeCode == historyItem.routeId.toString() }
+
+                    if (routeItem != null) {
+                        BuildCard(
+                            routeName = "Rota ${routeItem.route.routeCode}",
+                            startTime = routeItem.route.startedAt.toFormattedTime(),
+                            endTime = routeItem.route.finishedAt.toFormattedTime(),
+                            startLocation = routeItem.startStreet,
+                            endLocation = routeItem.endStreet,
+                            duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
+                            fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                            rating = "4.$index",
+                            logo = routeItem.route.pictureUri ?: "arabus-logo",
+                        )
                     } else {
-                        "real-logo"
+                        Text("Carregando rota...", modifier = Modifier.padding(16.dp))
                     }
-                    BuildCard(
-                        routeName = "Expresso Estelar $index",
-                        startTime = "07:00",
-                        endTime = "07:30",
-                        startLocation = "Avenida Ceci Cunha, Centro",
-                        endLocation = "IFAL - Campus Arapiraca",
-                        duration = "30min",
-                        fareInfo = "Sem tarifa",
-                        rating = "4.$index",
-                        logo = logo
-                    )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
@@ -182,8 +213,12 @@ private fun BuildCard(
     }
 }
 
+
 @Composable
 @Preview
 private fun Preview() {
-    HistoryScreen(navController = NavHostController(LocalContext.current))
+    val navController = NavHostController(LocalContext.current)
+    val mockRouteViewModel = RouteViewModel(Application())
+    val mockHistoryViewModel = HistoryViewModel(Application())
+    HistoryScreen(navController, mockRouteViewModel, mockHistoryViewModel)
 }
