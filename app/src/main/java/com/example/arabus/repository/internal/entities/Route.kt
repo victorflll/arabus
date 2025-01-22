@@ -35,7 +35,7 @@ fun routesSeed(): List<Route> {
 
     return listOf(
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7557",
             originLongitude = "-36.6615",
             destinationLatitude = "-9.7563",
@@ -47,7 +47,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7500",
             originLongitude = "-36.6600",
             destinationLatitude = "-9.7450",
@@ -59,7 +59,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7600",
             originLongitude = "-36.6700",
             destinationLatitude = "-9.7650",
@@ -71,7 +71,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7511",
             originLongitude = "-36.6608",
             destinationLatitude = "-9.7470",
@@ -83,7 +83,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7570",
             originLongitude = "-36.6725",
             destinationLatitude = "-9.7568",
@@ -95,7 +95,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7575",
             originLongitude = "-36.6590",
             destinationLatitude = "-9.7620",
@@ -107,7 +107,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7540",
             originLongitude = "-36.6650",
             destinationLatitude = "-9.7550",
@@ -119,7 +119,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7560",
             originLongitude = "-36.6610",
             destinationLatitude = "-9.7570",
@@ -131,7 +131,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7535",
             originLongitude = "-36.6680",
             destinationLatitude = "-9.7545",
@@ -143,7 +143,7 @@ fun routesSeed(): List<Route> {
             available = true
         ),
         Route(
-            routeCode = Random.nextInt(100, 1000).toString(),
+            routeCode = Random.nextInt(1, 5).toString(),
             originLatitude = "-9.7552",
             originLongitude = "-36.6638",
             destinationLatitude = "-9.7525",
