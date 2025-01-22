@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,19 +11,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.arabus.FavoritesScreen
 import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.HistoryScreenPath
 import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
-import com.example.arabus.NotificationScreenPath
 import com.example.arabus.RegisterRouteScreen
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
+import com.example.arabus.ui.factories.FavoriteViewModelFactory
 import com.example.arabus.ui.screens.HomeScreen
+import com.example.arabus.ui.view.FavoriteViewModel
 import com.example.arabus.ui.view.HistoryViewModel
-import com.example.arabus.ui.view.NotificationViewModel
 import com.example.arabus.ui.view.RouteViewModel
 
 class MainActivity : ComponentActivity() {
@@ -66,12 +66,24 @@ private fun App() {
                 )
             }
         }
-        composable(FavoritesScreenPath) { FavoritesScreen(navController) }
-        composable(NotificationScreenPath) {
+        composable(FavoritesScreenPath) {
             val viewModelStoreOwner = LocalViewModelStoreOwner.current
             viewModelStoreOwner?.let { owner ->
-                val notificationViewModel: NotificationViewModel = viewModel(owner)
-                NotificationScreen(navController = navController, viewModel = notificationViewModel)
+                val favoriteViewModel: FavoriteViewModel = viewModel(owner)
+                FavoritesScreen(navController = navController, viewModel = favoriteViewModel)
+            }
+        }
+        composable(FavoritesScreenPath) {
+            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+            val application = LocalContext.current.applicationContext as Application
+            val routeViewModel: RouteViewModel = viewModel()
+
+            viewModelStoreOwner?.let { owner ->
+                val favoriteViewModel: FavoriteViewModel = viewModel(
+                    owner,
+                    factory = FavoriteViewModelFactory(application, routeViewModel)
+                )
+                FavoritesScreen(navController = navController, viewModel = favoriteViewModel)
             }
         }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }

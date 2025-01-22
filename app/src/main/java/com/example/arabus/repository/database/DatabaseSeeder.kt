@@ -5,6 +5,7 @@ import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
 import com.example.arabus.repository.internal.entities.historySeed
+import com.example.arabus.repository.internal.entities.favoriteSeed
 import com.example.arabus.repository.internal.entities.routesSeed
 import com.example.arabus.ui.utils.Password
 import java.util.Date
@@ -15,6 +16,7 @@ object DatabaseSeeder {
         val userDao = db.userDao()
         val notificationDao = db.notificationDao()
         val routeDao = db.routeDao()
+        val favoriteDao = db.favoriteDao()
         val historyDao = db.historyDao()
 
         if (roleDao.getAll().isEmpty()) {
@@ -100,12 +102,18 @@ object DatabaseSeeder {
             routes.forEach { route ->
                 routeDao.insert(route)
             }
-        }
-
+       
         val historyList = historySeed(routeDao.getAvailableRoutes())
         if (historyList.isNotEmpty()) {
             historyList.forEach { historyItem ->
                 historyDao.insert(historyItem)
+            }
+        }
+
+        val favorites = favoriteSeed()
+        if (favoriteDao.getAll().isEmpty()) {
+            favorites.forEach { fav ->
+                favoriteDao.insert(fav)
             }
         }
     }
