@@ -1,14 +1,10 @@
-package com.example.arabus.ui
+package com.example.arabus
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,27 +12,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.arabus.R
+import androidx.navigation.NavHostController
+import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.theme.AppLightGrey
 
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(navController: NavHostController) {
     ArabusTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState())) {
+        AppScaffold(navController = navController) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Spacer(modifier = Modifier.height(36.dp))
 
                 NotificationHeader()
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // EXEMPLOS (TESTE)
                 val sections = listOf(
                     "Viagem atual para Deputado Nezinho" to listOf(
                         "Seu ônibus chegou!" to "05:20",
@@ -80,7 +77,7 @@ fun NotificationHeader() {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        androidx.compose.material3.Text(
+        Text(
             text = "Notificações",
             style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
         )
@@ -90,7 +87,7 @@ fun NotificationHeader() {
 @Composable
 fun NotificationSection(title: String, notifications: List<Pair<String, String>>) {
     Column {
-        androidx.compose.material3.Text(
+        Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(start = 14.dp, bottom = 6.dp)
@@ -119,7 +116,7 @@ fun NotificationCard(message: String, time: String) {
             .wrapContentWidth()
             .wrapContentHeight(),
         shape = RoundedCornerShape(8.dp),
-        colors = androidx.compose.material3.CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = AppGreenOpacity
         )
     ) {
@@ -138,7 +135,7 @@ fun NotificationCard(message: String, time: String) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            androidx.compose.material3.Text(
+            Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
                 modifier = Modifier.weight(1f),
@@ -146,7 +143,7 @@ fun NotificationCard(message: String, time: String) {
                 overflow = TextOverflow.Ellipsis
             )
 
-            androidx.compose.material3.Text(
+            Text(
                 text = time,
                 style = MaterialTheme.typography.bodySmall.copy(color = TypographyColor, fontWeight = FontWeight.Bold)
             )
