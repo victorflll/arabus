@@ -1,5 +1,6 @@
 package com.example.arabus.repository.database
 
+import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
 import com.example.arabus.repository.internal.entities.routesSeed
@@ -10,38 +11,98 @@ object DatabaseSeeder {
     suspend fun populateDatabase(db: AppDatabase) {
         val roleDao = db.roleDao()
         val userDao = db.userDao()
+        val notificationDao = db.notificationDao()
         val routeDao = db.routeDao()
+        val historyDao = db.historyDao()
 
-        val roles = listOf(
-            Role(name = "Admin"),
-            Role(name = "User"),
-            Role(name = "Driver"),
-        )
-        roles.forEach { role ->
-            roleDao.insert(role)
+        if (roleDao.getAll().isEmpty()) {
+            val roles = listOf(
+                Role(name = "Admin"),
+                Role(name = "User"),
+                Role(name = "Driver"),
+            )
+            roles.forEach { role ->
+                roleDao.insert(role)
+            }
         }
 
-        val users = listOf(
-            User(
-                email = "admin@gmail.com",
-                password = Password.hashPassword("admin123"),
-                roleId = 1,
-                createdAt = Date()
+        if (userDao.getAll().isEmpty()) {
+            val users = listOf(
+                User(
+                    email = "admin@gmail.com",
+                    password = Password.hashPassword("admin123"),
+                    roleId = 1,
+                    createdAt = Date()
+                ),
+                User(
+                    email = "user@gmail.com",
+                    password = Password.hashPassword("user123"),
+                    roleId = 2,
+                    createdAt = Date()
+                )
+            )
+            users.forEach { user ->
+                userDao.insert(user)
+            }
+        }
+
+        val userId = 1
+
+        val notifications = listOf(
+            Notification(
+                userId = userId,
+                title = "Viagem atual",
+                message = "victor gay!",
+                timestamp = Date()
             ),
-            User(
-                email = "user@gmail.com",
-                password = Password.hashPassword("user123"),
-                roleId = 2,
-                createdAt = Date()
+            Notification(
+                userId = userId,
+                title = "Viagem atual",
+                message = "Seu ônibus está chegando...",
+                timestamp = Date()
+            ),
+            Notification(
+                userId = userId,
+                title = "Centro - Deputado Nezinho",
+                message = "Desembarque!",
+                timestamp = Date()
+            ),
+            Notification(
+                userId = userId,
+                title = "Centro - Deputado Nezinho",
+                message = "Seu ônibus chegou!",
+                timestamp = Date()
+            ),
+            Notification(
+                userId = userId,
+                title = "Terminal - IFAL",
+                message = "Ônibus atrasado",
+                timestamp = Date()
+            ),
+            Notification(
+                userId = userId,
+                title = "Terminal - IFAL",
+                message = "Ônibus saiu do ponto inicial",
+                timestamp = Date()
             )
         )
-        users.forEach { user ->
-            userDao.insert(user)
+
+        if (notificationDao.getAll().isEmpty()) {
+            notifications.forEach { notification ->
+                notificationDao.insert(notification)
+            }
         }
 
         val routes = routesSeed()
-        routes.forEach { route ->
-            routeDao.insert(route)
+        if (routeDao.getAvailableRoutes().isEmpty()) {
+            routes.forEach { route ->
+                routeDao.insert(route)
+            }
         }
+
+//        val historyList = historySeed(routes)
+//        historyList.forEach { historyItem ->
+//            historyDao.insert(historyItem)
+//        }
     }
 }

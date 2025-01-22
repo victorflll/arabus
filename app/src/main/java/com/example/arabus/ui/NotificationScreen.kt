@@ -1,62 +1,84 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.arabus.R
+import com.example.arabus.components.AppScaffold
+import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.ui.theme.AppGreenOpacity
+import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
-import com.example.arabus.ui.theme.AppLightGrey
+import com.example.arabus.ui.utils.toFormattedTime
+import com.example.arabus.ui.view.NotificationViewModel
+import java.util.Date
 
 @Composable
-fun NotificationScreen() {
+fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
+    val notifications = remember { mutableStateListOf<Notification>() }
+
+    LaunchedEffect(Unit) {
+        viewModel.getNotificationsByUserId(1) { fetchedNotifications ->
+            notifications.clear()
+            notifications.addAll(fetchedNotifications)
+        }
+    }
+
     ArabusTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp).verticalScroll(rememberScrollState())) {
+        AppScaffold(navController = navController) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 Spacer(modifier = Modifier.height(36.dp))
 
                 NotificationHeader()
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                // EXEMPLOS (TESTE)
-                val sections = listOf(
-                    "Viagem atual para Deputado Nezinho" to listOf(
-                        "Seu ônibus chegou!" to "05:20",
-                        "Seu ônibus está chegando..." to "05:15"
-                    ),
-                    "Centro - Deputado Nezinho às 12:30" to listOf(
-                        "Desembarque!" to "12:30",
-                        "Seu ônibus chegou!" to "12:15",
-                        "Seu ônibus está chegando..." to "12:10"
-                    ),
-                    "Terminal - IFAL às 18:00" to listOf(
-                        "Ônibus atrasado" to "18:05",
-                        "Ônibus saiu do ponto inicial" to "17:45",
-                        "Chegue ao ponto de embarque" to "17:30"
-                    ),
-                )
+                if (notifications.isEmpty()) {
+                    EmptyNotificationsMessage()
+                } else {
+                    val groupedNotifications = notifications
+                        .groupBy { it.title }
+                        .map { (title, items) ->
+                            title to items.map { it.message to it.timestamp.toFormattedTime() }
+                        }
 
-                sections.forEach { (title, notifications) ->
-                    NotificationSection(title = title, notifications = notifications)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    groupedNotifications.forEach { (title, messages) ->
+                        NotificationSection(title = title, notifications = messages)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -80,7 +102,7 @@ fun NotificationHeader() {
 
         Spacer(modifier = Modifier.width(12.dp))
 
-        androidx.compose.material3.Text(
+        Text(
             text = "Notificações",
             style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
         )
@@ -90,9 +112,12 @@ fun NotificationHeader() {
 @Composable
 fun NotificationSection(title: String, notifications: List<Pair<String, String>>) {
     Column {
-        androidx.compose.material3.Text(
+        Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = TypographyColor,
+                fontWeight = FontWeight.Bold
+            ),
             modifier = Modifier.padding(start = 14.dp, bottom = 6.dp)
         )
 
@@ -116,10 +141,9 @@ fun NotificationCard(message: String, time: String) {
     Card(
         modifier = Modifier
             .padding(horizontal = 14.dp)
-            .wrapContentWidth()
-            .wrapContentHeight(),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
-        colors = androidx.compose.material3.CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = AppGreenOpacity
         )
     ) {
@@ -138,18 +162,47 @@ fun NotificationCard(message: String, time: String) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            androidx.compose.material3.Text(
+            Text(
                 text = message,
-                style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = TypographyColor,
+                    fontWeight = FontWeight.Bold
+                ),
                 modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                maxLines = Int.MAX_VALUE,
+                overflow = TextOverflow.Visible
             )
 
-            androidx.compose.material3.Text(
+            Text(
                 text = time,
-                style = MaterialTheme.typography.bodySmall.copy(color = TypographyColor, fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = TypographyColor,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
 }
+
+@Composable
+fun EmptyNotificationsMessage() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Nenhuma notificação disponível",
+            style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun Preview() {
+    NotificationCard(
+        message = "Title",
+        time = Date().toFormattedTime(),
+    )
+}
+

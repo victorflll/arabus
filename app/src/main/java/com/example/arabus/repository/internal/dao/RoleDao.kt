@@ -9,7 +9,7 @@ interface RoleDao {
     suspend fun insert(role: Role)
 
     @Query("SELECT * FROM role")
-    suspend fun getAll(): Role?
+    suspend fun getAll(): List<Role>
 
     @Query("SELECT * FROM role WHERE id = :roleId")
     suspend fun getById(roleId: Int): Role?
