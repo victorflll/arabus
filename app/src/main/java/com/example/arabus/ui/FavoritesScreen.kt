@@ -99,7 +99,7 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                                     price = route.route.cost?.takeIf { it > 0 }
                                         ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
                                     logo = route.route.pictureUri ?: "arabus-logo",
-                                    line = "221 - Pau D’arco",
+                                    line = "Rota ${route.route.routeCode}",
                                     rating = "Rota ${route.route.routeCode}",
                                 )
                             )
