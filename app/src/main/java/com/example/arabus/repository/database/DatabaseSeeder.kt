@@ -103,19 +103,19 @@ object DatabaseSeeder {
                 routeDao.insert(route)
             }
 
-            val historyList = historySeed(routeDao.getAvailableRoutes())
-            if (historyList.isNotEmpty()) {
-                historyList.forEach { historyItem ->
-                    historyDao.insert(historyItem)
-                }
+        val historyList = historySeed(routeDao.getAvailableRoutes())
+        if (historyList.isNotEmpty()) {
+            historyList.forEach { historyItem ->
+                historyDao.insert(historyItem)
             }
+        }
 
-            val favorites = favoriteSeed()
-            if (favoriteDao.getAll().isEmpty()) {
-                favorites.forEach { fav ->
-                    favoriteDao.insert(fav)
-                }
+        val favorites = favoriteSeed()
+        if (favoriteDao.getAll().isEmpty()) {
+            favorites.forEach { fav ->
+                favoriteDao.insert(fav)
             }
+        }
         }
     }
 }
