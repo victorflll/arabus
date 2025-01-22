@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -21,7 +20,6 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
@@ -34,8 +32,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.arabus.ui.SearchRouteScreenPath
-import com.example.arabus.ui.components.AppButton
+import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
 import com.example.arabus.ui.theme.AppGreen
@@ -46,8 +43,9 @@ import com.example.arabus.ui.utils.LoadAsset
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewRouteScreen(navController: NavHostController) {
-    Scaffold(
+fun HistoryScreen(navController: NavHostController) {
+    AppScaffold(
+        navController = navController,
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarColors(
@@ -57,19 +55,19 @@ fun ViewRouteScreen(navController: NavHostController) {
                     titleContentColor = AppWhite,
                     actionIconContentColor = AppGreen
                 ),
-                title = { Text("Rotas disponíveis") },
+                title = { Text("Histórico de Corridas") },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "Voltar"
                         )
                     }
                 },
             )
-        },
+        }
     ) { innerPadding ->
         Surface(
             modifier = Modifier
@@ -83,7 +81,6 @@ fun ViewRouteScreen(navController: NavHostController) {
                     } else {
                         "real-logo"
                     }
-
                     BuildCard(
                         routeName = "Expresso Estelar $index",
                         startTime = "07:00",
@@ -101,6 +98,7 @@ fun ViewRouteScreen(navController: NavHostController) {
         }
     }
 }
+
 
 @Composable
 private fun BuildCard(
@@ -130,12 +128,41 @@ private fun BuildCard(
                 .padding(top = 16.dp)
         ) {
             Row(
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                LoadAsset.PngExtension(logo)
+                Column {
+                    Text(text = startTime)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = endTime)
+                }
+                AppOriginToDestination(
+                    height = 18.dp,
+                    color = AppBlack,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                Column {
+                    Text(text = startLocation)
+                    Text(text = duration, fontSize = TextUnit(8f, TextUnitType.Sp), modifier = Modifier.padding(vertical = 6.dp))
+                    Text(text = endLocation)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = fareInfo,
+                    modifier = Modifier.align(Alignment.Top)
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                LoadAsset.PngExtension(logo, width = 84.dp, height = 84.dp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.Start) {
                     Text(text = routeName)
@@ -147,40 +174,10 @@ private fun BuildCard(
                             modifier = Modifier.height(16.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "Pontuação: $rating")
+                        Text(text = rating)
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(Icons.Outlined.Favorite, contentDescription = null)
             }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-            ) {
-                Column {
-                    Text(text = startTime)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(text = endTime)
-                }
-                AppOriginToDestination(
-                    height = 12.dp,
-                    color = AppBlack,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
-                Column {
-                    Text(text = startLocation)
-                    Text(text = duration, fontSize = TextUnit(8f, TextUnitType.Sp))
-                    Text(text = endLocation)
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = fareInfo)
-            }
-            AppButton("Visualizar", onClick =  {
-                println("View button clicked for $routeName!")
-            })
         }
     }
 }
@@ -188,5 +185,5 @@ private fun BuildCard(
 @Composable
 @Preview
 private fun Preview() {
-    ViewRouteScreen(navController = NavHostController(LocalContext.current))
+    HistoryScreen(navController = NavHostController(LocalContext.current))
 }

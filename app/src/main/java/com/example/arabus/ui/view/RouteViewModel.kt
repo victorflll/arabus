@@ -3,10 +3,16 @@ package com.example.arabus.ui.view
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.arabus.core.dtos.RouteDto
 import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.internal.entities.Route
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.URL
 import java.util.Date
 
 class RouteViewModel(application: Application) : AndroidViewModel(application) {
@@ -47,10 +53,41 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getAllRoutes(onResult: (List<Route>) -> Unit) {
+    private val _routes = MutableStateFlow<List<RouteDto>>(emptyList())
+    val routes: StateFlow<List<RouteDto>> = _routes
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    fun loadRoutes() {
         viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
             val routes = routeDao.getAvailableRoutes()
-            onResult(routes)
+            val dtos = routes.map { route ->
+                val startStreet = reverseGeocode(route.originLatitude, route.originLongitude)
+                    ?: "Local desconhecido"
+                val endStreet =
+                    reverseGeocode(route.destinationLatitude, route.destinationLongitude)
+                        ?: "Local desconhecido"
+                RouteDto(route, startStreet, endStreet)
+            }
+            _routes.value = dtos
+            _isLoading.value = false
+        }
+    }
+
+    private suspend fun reverseGeocode(latitude: String, longitude: String): String? {
+        val url =
+            "https://nominatim.openstreetmap.org/reverse?lat=$latitude&lon=$longitude&format=json"
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = URL(url).readText()
+                val jsonObject = JSONObject(response)
+                jsonObject.getJSONObject("address").optString("road", "Local desconhecido")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
     }
 
@@ -74,7 +111,7 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteRoute(routeCode: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val routerToDelete = routeDao.getByCode(routeCode)
-            if(routerToDelete != null ){
+            if (routerToDelete != null) {
                 routeDao.delete(routerToDelete)
             }
         }

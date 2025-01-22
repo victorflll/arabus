@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import com.example.arabus.R
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.*
 import com.example.arabus.ui.utils.LoadAsset

@@ -1,4 +1,4 @@
-package com.example.arabus.ui
+package com.example.arabus
 
 const val NotificationScreenPath = "notifications"
 const val HomeScreenPath = "home"
