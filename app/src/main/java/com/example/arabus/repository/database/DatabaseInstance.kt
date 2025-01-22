@@ -2,10 +2,6 @@ package com.example.arabus.repository.database
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.arabus.CoroutineScopeProvider
-import kotlinx.coroutines.launch
 
 object DatabaseInstance {
     @Volatile
@@ -17,18 +13,7 @@ object DatabaseInstance {
                 context.applicationContext,
                 AppDatabase::class.java,
                 "arabus_database"
-            ).addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    super.onCreate(db)
-                    val applicationScope =
-                        (context.applicationContext as CoroutineScopeProvider).ioScope
-                    applicationScope.launch {
-                        INSTANCE?.let { appDatabase ->
-                            DatabaseSeeder.populateDatabase(appDatabase)
-                        }
-                    }
-                }
-            }).build()
+            ).build()
             INSTANCE = instance
             instance
         }
