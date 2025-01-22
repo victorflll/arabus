@@ -1,6 +1,7 @@
 import com.example.arabus.repository.database.AppDatabase
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
+import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.ui.utils.Password
 import java.util.Date
 
@@ -8,6 +9,7 @@ object DatabaseSeeder {
     suspend fun populateDatabase(db: AppDatabase) {
         val roleDao = db.roleDao()
         val userDao = db.userDao()
+        val notificationDao = db.notificationDao()
 
         val roles = listOf(
             Role(name = "Admin"),
@@ -34,6 +36,21 @@ object DatabaseSeeder {
         )
         users.forEach { user ->
             userDao.insert(user)
+        }
+
+        val userId = 1
+
+        val notifications = listOf(
+            Notification(userId = userId, title = "Viagem atual", message = "victor gay!", timestamp = Date()),
+            Notification(userId = userId, title = "Viagem atual", message = "Seu ônibus está chegando...", timestamp = Date()),
+            Notification(userId = userId, title = "Centro - Deputado Nezinho", message = "Desembarque!", timestamp = Date()),
+            Notification(userId = userId, title = "Centro - Deputado Nezinho", message = "Seu ônibus chegou!", timestamp = Date()),
+            Notification(userId = userId, title = "Terminal - IFAL", message = "Ônibus atrasado", timestamp = Date()),
+            Notification(userId = userId, title = "Terminal - IFAL", message = "Ônibus saiu do ponto inicial", timestamp = Date())
+        )
+
+        notifications.forEach { notification ->
+            notificationDao.insert(notification)
         }
     }
 }
