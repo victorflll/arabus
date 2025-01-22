@@ -4,39 +4,28 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.arabus.R
-import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.theme.AppLightGrey
-import com.example.arabus.ui.utils.toFormattedTime
-import com.example.arabus.ui.view.NotificationViewModel
 
 @Composable
-fun NotificationScreen(viewModel: NotificationViewModel = viewModel()) {
-    val notifications = remember { mutableStateListOf<Notification>() }
-
-    LaunchedEffect(Unit) {
-        viewModel.getNotificationsByUserId(1) { fetchedNotifications ->
-            notifications.clear()
-            notifications.addAll(fetchedNotifications)
-        } }
-
+fun NotificationScreen(navController: NavHostController) {
     ArabusTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+        AppScaffold(navController = navController) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)

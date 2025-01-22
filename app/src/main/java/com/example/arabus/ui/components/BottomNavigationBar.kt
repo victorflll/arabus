@@ -3,6 +3,7 @@ package com.example.arabus.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.NavigationBar
@@ -34,8 +35,8 @@ fun BottomNavigationBar(navController: NavHostController) {
         NavigationBarItem(
             selected = false,
             onClick = {navController.navigate("history")},
-            icon = { androidx.compose.material3.Icon(Icons.Default.Person, contentDescription = "Perfil") },
-            label = { androidx.compose.material3.Text("Perfil") }
+            icon = { androidx.compose.material3.Icon(Icons.Default.History, contentDescription = "Histórico") },
+            label = { androidx.compose.material3.Text("Histórico") }
         )
     }
 }

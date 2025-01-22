@@ -1,4 +1,4 @@
-package com.example.arabus.ui
+package com.example.arabus
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -12,64 +12,67 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.arabus.R
+import androidx.navigation.NavHostController
+import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.*
 import com.example.arabus.ui.utils.LoadAsset
 
 @Composable
-fun FavoritesScreen() {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
-            Spacer(modifier = Modifier.height(36.dp))
-            FavoritesHeader()
-            Spacer(modifier = Modifier.height(20.dp))
+fun FavoritesScreen(navController: NavHostController) {
+    ArabusTheme {
+        AppScaffold(navController = navController) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+            ) {
+                Spacer(modifier = Modifier.height(36.dp))
+                FavoritesHeader()
+                Spacer(modifier = Modifier.height(20.dp))
 
-            val favoriteRoutes = listOf(
-                FavoriteRoute(
-                    startTime = "05:20",
-                    endTime = "06:00",
-                    startLocation = "Cirilo José, Boa Vista",
-                    endLocation = "Terminal Ceci Cunha",
-                    duration = "40min",
-                    price = "R$ 3,50",
-                    logo = "real-logo",
-                    line = "221 - Pau D’arco",
-                    rating = "4.9"
-                ),
-                FavoriteRoute(
-                    startTime = "12:30",
-                    endTime = "13:00",
-                    startLocation = "Terminal Ceci Cunha",
-                    endLocation = "IFAL - Campus Arapiraca",
-                    duration = "30min",
-                    price = "Sem tarifa",
-                    logo = "metropolitana-logo",
-                    line = "003 - Poção",
-                    rating = "4.5"
+                val favoriteRoutes = listOf(
+                    FavoriteRoute(
+                        startTime = "05:20",
+                        endTime = "06:00",
+                        startLocation = "Cirilo José, Boa Vista",
+                        endLocation = "Terminal Ceci Cunha",
+                        duration = "40min",
+                        price = "R$ 3,50",
+                        logo = "real-logo",
+                        line = "221 - Pau D’arco",
+                        rating = "4.9"
+                    ),
+                    FavoriteRoute(
+                        startTime = "12:30",
+                        endTime = "13:00",
+                        startLocation = "Terminal Ceci Cunha",
+                        endLocation = "IFAL - Campus Arapiraca",
+                        duration = "30min",
+                        price = "Sem tarifa",
+                        logo = "metropolitana-logo",
+                        line = "003 - Poção",
+                        rating = "4.5"
+                    )
                 )
-            )
 
-            LazyColumn {
-                items(favoriteRoutes) { route ->
-                    FavoriteRouteCard(route)
-                    Spacer(modifier = Modifier.height(16.dp))
+                LazyColumn {
+                    items(favoriteRoutes) { route ->
+                        FavoriteRouteCard(route)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable
 fun FavoritesHeader() {
@@ -169,5 +172,5 @@ data class FavoriteRoute(
 @Composable
 @Preview(showBackground = true)
 fun FavoritesScreenPreview() {
-    FavoritesScreen()
+    FavoritesScreen(navController = NavHostController(LocalContext.current))
 }

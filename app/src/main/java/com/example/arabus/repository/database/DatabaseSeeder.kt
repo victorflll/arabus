@@ -1,7 +1,9 @@
 package com.example.arabus.repository.database
 
+import android.util.Log
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
+import com.example.arabus.repository.internal.entities.historySeed
 import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.repository.internal.entities.routesSeed
 import com.example.arabus.ui.utils.Password
@@ -13,6 +15,7 @@ object DatabaseSeeder {
         val userDao = db.userDao()
         val notificationDao = db.notificationDao()
         val routeDao = db.routeDao()
+        val historyDao = db.historyDao()
 
         val roles = listOf(
             Role(name = "Admin"),
@@ -59,5 +62,11 @@ object DatabaseSeeder {
         routes.forEach { route ->
             routeDao.insert(route)
         }
+
+//        val historyList = historySeed(routes)
+//        historyList.forEach { historyItem ->
+//            historyDao.insert(historyItem)
+//        }
+
     }
 }

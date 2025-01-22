@@ -1,6 +1,10 @@
 package com.example.arabus.repository.internal.entities
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
+import java.util.Calendar
 import java.util.Date
 
 @Entity(
@@ -26,3 +30,16 @@ data class History(
     @ColumnInfo(name = "route_id") val routeId: Int,
     @ColumnInfo(name = "finished_at") val finishedAt: Date? = null
 )
+
+fun historySeed(routes: List<Route>): List<History> {
+    val calendar = Calendar.getInstance()
+    val finishedAt = calendar.time
+
+    return routes.mapIndexed { index, route ->
+        History(
+            userId = 1,
+            routeId = route.id,
+            finishedAt = finishedAt
+        )
+    }
+}
