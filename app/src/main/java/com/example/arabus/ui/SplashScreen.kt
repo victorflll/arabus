@@ -22,12 +22,14 @@ import com.example.arabus.repository.database.DatabaseSeeder
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 
 @Composable
 fun SplashScreen(navController: NavHostController, context: Context) {
     var isDatabaseReady by remember { mutableStateOf(false) }
+    var hasWaitedMinimumTime by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
@@ -40,7 +42,12 @@ fun SplashScreen(navController: NavHostController, context: Context) {
         isDatabaseReady = true
     }
 
-    if (isDatabaseReady) {
+    LaunchedEffect(Unit) {
+        delay(1000)
+        hasWaitedMinimumTime = true
+    }
+
+    if (isDatabaseReady && hasWaitedMinimumTime) {
         LaunchedEffect(Unit) {
             navController.navigate(LoginRouteScreen) {
                 popUpTo(SplashScreenPath) { inclusive = true }
@@ -48,6 +55,7 @@ fun SplashScreen(navController: NavHostController, context: Context) {
         }
     }
 
+    // Layout da Splash Screen
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = AppGreen
@@ -58,7 +66,7 @@ fun SplashScreen(navController: NavHostController, context: Context) {
         ) {
             LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
 
-            if (!isDatabaseReady) {
+            if (!isDatabaseReady || !hasWaitedMinimumTime) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
