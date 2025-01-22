@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,6 +32,7 @@ import com.example.arabus.LoginRouteScreen
 import com.example.arabus.NotificationScreenPath
 import com.example.arabus.RegisterRouteScreen
 import com.example.arabus.SearchRouteScreenPath
+import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppTextField
@@ -56,8 +58,12 @@ private fun App() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = LoginRouteScreen
+        startDestination = SplashScreenPath
     ) {
+        composable(SplashScreenPath) {
+            val context = LocalContext.current
+            SplashScreen(navController = navController, context = context)
+        }
         composable(HomeScreenPath) { HomeScreen(navController) }
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
         composable(ViewRouteScreenPath) {
