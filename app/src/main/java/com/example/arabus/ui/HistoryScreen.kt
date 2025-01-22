@@ -57,7 +57,6 @@ import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.RouteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewModel, historyViewModel: HistoryViewModel) {
     val userMockId = 1
@@ -114,7 +113,7 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                 LazyColumn {
                     items(history.size) { index ->
                         val historyItem = history[index]
-                        val routeItem = routes.find { it.route.routeCode == historyItem.routeId.toString() }
+                        val routeItem = routes.find { it.route.id == historyItem.routeId }
 
                         if (routeItem != null) {
                             BuildCard(

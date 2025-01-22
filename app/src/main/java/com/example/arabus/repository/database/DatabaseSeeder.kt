@@ -1,8 +1,10 @@
 package com.example.arabus.repository.database
 
+import android.util.Log
 import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
+import com.example.arabus.repository.internal.entities.historySeed
 import com.example.arabus.repository.internal.entities.routesSeed
 import com.example.arabus.ui.utils.Password
 import java.util.Date
@@ -100,9 +102,11 @@ object DatabaseSeeder {
             }
         }
 
-//        val historyList = historySeed(routes)
-//        historyList.forEach { historyItem ->
-//            historyDao.insert(historyItem)
-//        }
+        val historyList = historySeed(routeDao.getAvailableRoutes())
+        if (historyList.isNotEmpty()) {
+            historyList.forEach { historyItem ->
+                historyDao.insert(historyItem)
+            }
+        }
     }
 }
