@@ -29,6 +29,7 @@ import com.example.arabus.HistoryScreenPath
 import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
 import com.example.arabus.NotificationScreenPath
+import com.example.arabus.RegisterRouteScreen
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
@@ -69,7 +70,8 @@ private fun App() {
         composable(HistoryScreenPath) { HistoryScreen(navController) }
         composable(FavoritesScreenPath) { FavoritesScreen() }
         composable(NotificationScreenPath) { NotificationScreen() }
-        composable(LoginRouteScreen) { ViewLoginScreen(navController) }
+        composable(LoginRouteScreen) { ViewLoginScreen(navController)}
+        composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
     }
 }
 

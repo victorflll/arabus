@@ -8,6 +8,9 @@ interface RoleDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(role: Role)
 
+    @Query("SELECT * FROM role")
+    suspend fun getAll(): Role?
+
     @Query("SELECT * FROM role WHERE id = :roleId")
     suspend fun getById(roleId: Int): Role?
 
