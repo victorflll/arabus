@@ -38,7 +38,7 @@ fun historySeed(routes: List<Route>): List<History> {
     return routes.mapIndexed { index, route ->
         History(
             userId = 1,
-            routeId = route.routeCode.toInt(),
+            routeId = route.id,
             finishedAt = finishedAt
         )
     }

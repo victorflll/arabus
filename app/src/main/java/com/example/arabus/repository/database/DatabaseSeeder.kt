@@ -47,10 +47,10 @@ object DatabaseSeeder {
             routeDao.insert(route)
         }
 
-        val historyList = historySeed(routes)
-        historyList.forEach { historyItem ->
-            historyDao.insert(historyItem)
-        }
+//        val historyList = historySeed(routes)
+//        historyList.forEach { historyItem ->
+//            historyDao.insert(historyItem)
+//        }
 
     }
 }

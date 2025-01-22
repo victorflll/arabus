@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -65,7 +66,6 @@ private fun App() {
                 )
             }
         }
-
         composable(FavoritesScreenPath) { FavoritesScreen(navController) }
         composable(NotificationScreenPath) { NotificationScreen(navController) }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }

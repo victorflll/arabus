@@ -64,12 +64,6 @@ fun SplashScreen(navController: NavHostController, context: Context) {
             contentAlignment = Alignment.Center
         ) {
             LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
-
-            if (!isDatabaseReady || !hasWaitedMinimumTime) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
-            }
         }
     }
 }
