@@ -59,21 +59,19 @@ class RouteViewModel(application: Application) : AndroidViewModel(application) {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun loadRoutes() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.value = true
-            val routes = routeDao.getAvailableRoutes()
-            val dtos = routes.map { route ->
+    suspend fun loadRoutes() {
+        _isLoading.value = true
+        val routes = withContext(Dispatchers.IO) {
+            routeDao.getAvailableRoutes().map { route ->
                 val startStreet = reverseGeocode(route.originLatitude, route.originLongitude)
                     ?: "Local desconhecido"
-                val endStreet =
-                    reverseGeocode(route.destinationLatitude, route.destinationLongitude)
-                        ?: "Local desconhecido"
+                val endStreet = reverseGeocode(route.destinationLatitude, route.destinationLongitude)
+                    ?: "Local desconhecido"
                 RouteDto(route, startStreet, endStreet)
             }
-            _routes.value = dtos
-            _isLoading.value = false
         }
+        _routes.value = routes
+        _isLoading.value = false
     }
 
     private suspend fun reverseGeocode(latitude: String, longitude: String): String? {

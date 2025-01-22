@@ -1,6 +1,9 @@
 package com.example.arabus.repository.internal.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.example.arabus.repository.internal.entities.Favorite
 
 @Dao
@@ -11,9 +14,6 @@ interface FavoriteDao {
     @Query("SELECT * FROM favorite WHERE user_id = :userId")
     suspend fun getByUserId(userId: Int): List<Favorite>
 
-    @Update
-    suspend fun update(favorite: Favorite)
-
-    @Delete
-    suspend fun delete(favorite: Favorite)
+    @Query("SELECT * FROM favorite")
+    suspend fun getAll(): List<Favorite>
 }

@@ -19,4 +19,8 @@ interface RouteDao {
 
     @Delete
     suspend fun delete(route: Route)
+
+    @Query("SELECT * FROM route WHERE id = :routeId LIMIT 1")
+    suspend fun getById(routeId: Int): Route?
+
 }
