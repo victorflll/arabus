@@ -27,3 +27,13 @@ data class Favorite(
     val description: String? = null,
     @ColumnInfo(name = "created_at") val createdAt: Date
 )
+
+fun favoriteSeed(): List<Favorite> {
+    return listOf(
+        Favorite(userId = 1, routeId = 1, createdAt = Date()),
+        Favorite(userId = 1, routeId = 3, createdAt = Date()),
+        Favorite(userId = 1, routeId = 4, createdAt = Date()),
+        Favorite(userId = 1, routeId = 6, createdAt = Date()),
+        Favorite(userId = 1, routeId = 7, createdAt = Date()),
+    )
+}
