@@ -55,7 +55,6 @@ fun SplashScreen(navController: NavHostController, context: Context) {
         }
     }
 
-    // Layout da Splash Screen
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = AppGreen
