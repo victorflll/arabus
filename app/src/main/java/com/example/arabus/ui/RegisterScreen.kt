@@ -1,4 +1,4 @@
-package com.example.arabus
+package com.example.arabus.ui
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBarsPadding
