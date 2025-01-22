@@ -1,7 +1,9 @@
-import com.example.arabus.repository.database.AppDatabase
+package com.example.arabus.repository.database
+
 import com.example.arabus.repository.internal.entities.Role
 import com.example.arabus.repository.internal.entities.User
 import com.example.arabus.repository.internal.entities.Notification
+import com.example.arabus.repository.internal.entities.routesSeed
 import com.example.arabus.ui.utils.Password
 import java.util.Date
 
@@ -10,6 +12,7 @@ object DatabaseSeeder {
         val roleDao = db.roleDao()
         val userDao = db.userDao()
         val notificationDao = db.notificationDao()
+        val routeDao = db.routeDao()
 
         val roles = listOf(
             Role(name = "Admin"),
@@ -51,6 +54,10 @@ object DatabaseSeeder {
 
         notifications.forEach { notification ->
             notificationDao.insert(notification)
+
+        val routes = routesSeed()
+        routes.forEach { route ->
+            routeDao.insert(route)
         }
     }
 }

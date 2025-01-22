@@ -4,15 +4,13 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import com.example.arabus.CoroutineScopeProvider
 import kotlinx.coroutines.launch
 
 object DatabaseInstance {
     @Volatile
     private var INSTANCE: AppDatabase? = null
 
-    @OptIn(DelicateCoroutinesApi::class)
     fun getDatabase(context: Context): AppDatabase {
         return INSTANCE ?: synchronized(this) {
             val instance = Room.databaseBuilder(
@@ -22,7 +20,9 @@ object DatabaseInstance {
             ).addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    GlobalScope.launch {
+                    val applicationScope =
+                        (context.applicationContext as CoroutineScopeProvider).ioScope
+                    applicationScope.launch {
                         INSTANCE?.let { appDatabase ->
                             DatabaseSeeder.populateDatabase(appDatabase)
                         }
@@ -30,7 +30,7 @@ object DatabaseInstance {
                 }
             }).build()
             INSTANCE = instance
-            return instance
+            instance
         }
     }
 }
