@@ -15,7 +15,6 @@ import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.HistoryScreenPath
 import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
-import com.example.arabus.NotificationScreen
 import com.example.arabus.NotificationScreenPath
 import com.example.arabus.RegisterRouteScreen
 import com.example.arabus.SearchRouteScreenPath
@@ -23,6 +22,7 @@ import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.ui.screens.HomeScreen
 import com.example.arabus.ui.view.HistoryViewModel
+import com.example.arabus.ui.view.NotificationViewModel
 import com.example.arabus.ui.view.RouteViewModel
 
 class MainActivity : ComponentActivity() {
@@ -67,7 +67,13 @@ private fun App() {
             }
         }
         composable(FavoritesScreenPath) { FavoritesScreen(navController) }
-        composable(NotificationScreenPath) { NotificationScreen(navController) }
+        composable(NotificationScreenPath) {
+            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+            viewModelStoreOwner?.let { owner ->
+                val notificationViewModel: NotificationViewModel = viewModel(owner)
+                NotificationScreen(navController = navController, viewModel = notificationViewModel)
+            }
+        }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
     }
