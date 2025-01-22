@@ -8,23 +8,28 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import com.example.arabus.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.arabus.repository.internal.models.FavoriteWithRoute
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.*
 import com.example.arabus.ui.utils.LoadAsset
+import com.example.arabus.ui.view.FavoriteViewModel
 
 @Composable
-fun FavoritesScreen() {
+fun FavoritesScreen(viewModel: FavoriteViewModel = viewModel()) {
+    val userMockId = 1
+    var favoriteRoutes by remember { mutableStateOf<List<FavoriteWithRoute>>(emptyList()) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getFavoritesWithRoutes(userMockId) { favorites ->
+            favoriteRoutes = favorites
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -36,35 +41,14 @@ fun FavoritesScreen() {
             FavoritesHeader()
             Spacer(modifier = Modifier.height(20.dp))
 
-            val favoriteRoutes = listOf(
-                FavoriteRoute(
-                    startTime = "05:20",
-                    endTime = "06:00",
-                    startLocation = "Cirilo José, Boa Vista",
-                    endLocation = "Terminal Ceci Cunha",
-                    duration = "40min",
-                    price = "R$ 3,50",
-                    logo = "real-logo",
-                    line = "221 - Pau D’arco",
-                    rating = "4.9"
-                ),
-                FavoriteRoute(
-                    startTime = "12:30",
-                    endTime = "13:00",
-                    startLocation = "Terminal Ceci Cunha",
-                    endLocation = "IFAL - Campus Arapiraca",
-                    duration = "30min",
-                    price = "Sem tarifa",
-                    logo = "metropolitana-logo",
-                    line = "003 - Poção",
-                    rating = "4.5"
-                )
-            )
-
-            LazyColumn {
-                items(favoriteRoutes) { route ->
-                    FavoriteRouteCard(route)
-                    Spacer(modifier = Modifier.height(16.dp))
+            if (favoriteRoutes.isEmpty()) {
+                EmptyFavoritesMessage()
+            } else {
+                LazyColumn {
+                    items(favoriteRoutes) { route ->
+                        FavoriteRouteCard(route)
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
@@ -91,7 +75,7 @@ fun FavoritesHeader() {
 }
 
 @Composable
-fun FavoriteRouteCard(route: FavoriteRoute) {
+fun FavoriteRouteCard(route: FavoriteWithRoute) {
     Card(
         colors = CardDefaults.cardColors(containerColor = AppGreenOpacity),
         modifier = Modifier
@@ -105,9 +89,9 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    Text(text = route.startTime)
+                    Text(text = route.startedAt.toString())
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = route.endTime)
+                    Text(text = route.finishedAt.toString())
                 }
                 AppOriginToDestination(
                     height = 18.dp,
@@ -115,17 +99,15 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = route.startLocation)
+                    Text(text = route.description ?: "Origem desconhecida")
                     Text(
-                        text = route.duration,
-                        fontSize = TextUnit(10f, TextUnitType.Sp),
+                        text = "${route.finishedAt.time - route.startedAt.time} min",
                         modifier = Modifier.padding(vertical = 4.dp)
                     )
-                    Text(text = route.endLocation)
+                    Text(text = "Destino desconhecido")
                 }
                 Text(
-                    text = route.price,
-                    fontSize = TextUnit(12f, TextUnitType.Sp),
+                    text = route.cost?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
@@ -134,10 +116,10 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                LoadAsset.PngExtension(route.logo, width = 84.dp, height = 84.dp)
+                LoadAsset.PngExtension(route.pictureUri ?: "default-logo", width = 84.dp, height = 84.dp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.Start) {
-                    Text(text = route.line)
+                    Text(text = "Rota ${route.routeCode}")
                     Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Icon(
@@ -146,7 +128,7 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(text = route.rating)
+                        Text(text = "4.9")
                     }
                 }
             }
@@ -154,20 +136,15 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
     }
 }
 
-data class FavoriteRoute(
-    val startTime: String,
-    val endTime: String,
-    val startLocation: String,
-    val endLocation: String,
-    val duration: String,
-    val price: String,
-    val logo: String,
-    val line: String,
-    val rating: String
-)
-
 @Composable
-@Preview(showBackground = true)
-fun FavoritesScreenPreview() {
-    FavoritesScreen()
+fun EmptyFavoritesMessage() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Nenhum favorito salvo",
+            style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor)
+        )
+    }
 }

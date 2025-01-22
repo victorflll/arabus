@@ -1,58 +1,22 @@
 package com.example.arabus.ui.view
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.arabus.repository.database.DatabaseInstance
-import com.example.arabus.repository.internal.entities.Favorite
+import com.example.arabus.repository.internal.dao.FavoriteDao
+import com.example.arabus.repository.internal.models.FavoriteWithRoute
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Date
 
-class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
-    private val database = DatabaseInstance.getDatabase(application)
-    private val favoriteDao = database.favoriteDao()
+class FavoriteViewModel(private val favoriteDao: FavoriteDao) : ViewModel() {
 
-    fun insertFavorite(userId: Int, routeId: Int, description: String? = null) {
+    fun getFavoritesWithRoutes(userId: Int, onResult: (List<FavoriteWithRoute>) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val favorite = Favorite(
-                userId = userId,
-                routeId = routeId,
-                description = description,
-                createdAt = Date()
-            )
-            favoriteDao.insert(favorite)
-        }
-    }
-
-    fun getFavoritesByUserId(userId: Int, onResult: (List<Favorite>) -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val favorites = favoriteDao.getByUserId(userId)
-            onResult(favorites)
-        }
-    }
-
-    fun updateFavorite(userId: Int, routeId: Int, newRouteId: Int?, description: String?) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val existingFavorite = favoriteDao.getByUserId(userId)
-            val favoriteToUpdate = existingFavorite.firstOrNull { it.routeId == routeId }
-
-            if (favoriteToUpdate != null) {
-                val updatedFavorite = favoriteToUpdate.copy(
-                    description = description ?: favoriteToUpdate.description,
-                    routeId = newRouteId ?: favoriteToUpdate.routeId,
-                )
-                favoriteDao.update(updatedFavorite)
-            }
-        }
-    }
-
-    fun deleteFavoritesByUserId(userId: Int, routeId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val favorites = favoriteDao.getByUserId(userId)
-            val favoriteToDelete = favorites.firstOrNull { it.routeId == routeId }
-            if (favoriteToDelete != null) {
-                favoriteDao.delete(favoriteToDelete)
+            try {
+                val favorites = favoriteDao.getFavoritesWithRoutes(userId)
+                onResult(favorites)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResult(emptyList())
             }
         }
     }
