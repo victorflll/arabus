@@ -28,18 +28,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.R
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.repository.internal.entities.Notification
-import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.NotificationViewModel
+import java.util.Date
 
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
@@ -143,7 +144,7 @@ fun NotificationCard(message: String, time: String) {
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = AppGreen
+            containerColor = AppGreenOpacity
         )
     ) {
         Row(
@@ -195,3 +196,13 @@ fun EmptyNotificationsMessage() {
         )
     }
 }
+
+@Preview
+@Composable
+private fun Preview() {
+    NotificationCard(
+        message = "Title",
+        time = Date().toFormattedTime(),
+    )
+}
+
