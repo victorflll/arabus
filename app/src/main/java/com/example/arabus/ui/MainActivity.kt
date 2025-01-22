@@ -35,6 +35,7 @@ import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.ui.components.AppTextField
+import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.RouteViewModel
 import com.google.android.gms.maps.model.CameraPosition
@@ -93,7 +94,7 @@ fun HomeScreen(navController: NavHostController) {
     val textState = remember { mutableStateOf("") }
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
-            MapView(textState)
+            BuildBody(textState)
             AppTextField(
                 placeholder = "Para onde vamos hoje?",
                 textState = textState.value,
@@ -107,6 +108,11 @@ fun HomeScreen(navController: NavHostController) {
             )
         }
     }
+}
+
+@Composable
+private fun BuildBody(textState: MutableState<String>) {
+    Permissions.RequestLocationPermission { MapView(textState) }
 }
 
 @Composable
