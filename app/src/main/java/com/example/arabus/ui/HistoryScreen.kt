@@ -1,8 +1,10 @@
 package com.example.arabus.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +20,7 @@ import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,11 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.repository.internal.entities.History
-import com.example.arabus.repository.internal.entities.Route
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
 import com.example.arabus.ui.theme.AppGreen
@@ -54,20 +55,19 @@ import com.example.arabus.ui.utils.timeDifference
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.RouteViewModel
-import android.util.Log
-@OptIn(ExperimentalMaterial3Api::class)
 
+@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
 fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewModel, historyViewModel: HistoryViewModel) {
     val userMockId = 1
     val routes by routeViewModel.routes.collectAsState()
+    val isLoading by routeViewModel.isLoading.collectAsState()
 
     var history by rememberSaveable { mutableStateOf<List<History>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         historyViewModel.getHistoryByUserId(userMockId) { historyList ->
-            Log.d("HistoryScreen", "History loaded: ${historyList.size} items")
             history = historyList
         }
         routeViewModel.loadRoutes()
@@ -103,33 +103,39 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            LazyColumn {
-                items(history.size) { index ->
-                    val historyItem = history[index]
-                    val routeItem = routes.find { it.route.routeCode == historyItem.routeId.toString() }
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyColumn {
+                    items(history.size) { index ->
+                        val historyItem = history[index]
+                        val routeItem = routes.find { it.route.routeCode == historyItem.routeId.toString() }
 
-                    if (routeItem != null) {
-                        BuildCard(
-                            routeName = "Rota ${routeItem.route.routeCode}",
-                            startTime = routeItem.route.startedAt.toFormattedTime(),
-                            endTime = routeItem.route.finishedAt.toFormattedTime(),
-                            startLocation = routeItem.startStreet,
-                            endLocation = routeItem.endStreet,
-                            duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
-                            fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                            rating = "4.$index",
-                            logo = routeItem.route.pictureUri ?: "arabus-logo",
-                        )
-                    } else {
-                        Text("Carregando rota...", modifier = Modifier.padding(16.dp))
+                        if (routeItem != null) {
+                            BuildCard(
+                                routeName = "Rota ${routeItem.route.routeCode}",
+                                startTime = routeItem.route.startedAt.toFormattedTime(),
+                                endTime = routeItem.route.finishedAt.toFormattedTime(),
+                                startLocation = routeItem.startStreet,
+                                endLocation = routeItem.endStreet,
+                                duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
+                                fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                                rating = "4.$index",
+                                logo = routeItem.route.pictureUri ?: "arabus-logo",
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
     }
 }
-
 
 @Composable
 private fun BuildCard(
@@ -212,7 +218,6 @@ private fun BuildCard(
         }
     }
 }
-
 
 @Composable
 @Preview
