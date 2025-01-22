@@ -14,8 +14,10 @@ import java.util.Date
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userDao = DatabaseInstance.getDatabase(application).userDao()
 
-    fun insertUser(email: String, password: String, roleId: Int) {
+    fun insertUser(email: String, password: String, roleId: Int, onResult: (Long) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
+
+
             val now = Date()
             val user = User(
                 email = email,
@@ -24,7 +26,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
                 createdAt = now,
                 updatedAt = now
             )
-            userDao.insert(user)
+
+            val userId = userDao.insert(user)
+
+            withContext(Dispatchers.Main) {
+                onResult(userId)
+            }
         }
     }
 

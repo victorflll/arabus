@@ -31,6 +31,7 @@ import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
 import com.example.arabus.NotificationScreen
 import com.example.arabus.NotificationScreenPath
+import com.example.arabus.RegisterRouteScreen
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppScaffold
@@ -86,6 +87,7 @@ private fun App() {
         composable(FavoritesScreenPath) { FavoritesScreen(navController) }
         composable(NotificationScreenPath) { NotificationScreen(navController) }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
+        composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
     }
 }
 
@@ -94,7 +96,7 @@ fun HomeScreen(navController: NavHostController) {
     val textState = remember { mutableStateOf("") }
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
-            BuildBody(textState)
+            MapView(textState)
             AppTextField(
                 placeholder = "Para onde vamos hoje?",
                 textState = textState.value,
