@@ -2,12 +2,16 @@ package com.example.arabus.repository.internal.dao
 
 import androidx.room.*
 import com.example.arabus.repository.internal.entities.Notification
+import com.example.arabus.repository.internal.entities.Role
 
 @Dao
 interface NotificationDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(notification: Notification)
+
+    @Query("SELECT * FROM notifications")
+    suspend fun getAll(): List<Notification>
 
     @Query("SELECT * FROM notifications WHERE user_id = :userId ORDER BY timestamp DESC")
     suspend fun getByUserId(userId: Int): List<Notification>

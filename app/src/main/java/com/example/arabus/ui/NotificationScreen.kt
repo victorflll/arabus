@@ -1,29 +1,57 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.arabus.R
+import com.example.arabus.components.AppScaffold
+import com.example.arabus.repository.internal.entities.Notification
+import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppGreenOpacity
+import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
-import com.example.arabus.ui.theme.AppLightGrey
+import com.example.arabus.ui.utils.toFormattedTime
+import com.example.arabus.ui.view.NotificationViewModel
 
 @Composable
-fun NotificationScreen(navController: NavHostController) {
+fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
+    val notifications = remember { mutableStateListOf<Notification>() }
+
+    LaunchedEffect(Unit) {
+        viewModel.getNotificationsByUserId(1) { fetchedNotifications ->
+            notifications.clear()
+            notifications.addAll(fetchedNotifications)
+        }
+    }
+
     ArabusTheme {
         AppScaffold(navController = navController) {
             Column(
@@ -85,7 +113,10 @@ fun NotificationSection(title: String, notifications: List<Pair<String, String>>
     Column {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = TypographyColor,
+                fontWeight = FontWeight.Bold
+            ),
             modifier = Modifier.padding(start = 14.dp, bottom = 6.dp)
         )
 
@@ -112,7 +143,7 @@ fun NotificationCard(message: String, time: String) {
             .fillMaxWidth(),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = AppGreenOpacity
+            containerColor = AppGreen
         )
     ) {
         Row(
@@ -132,7 +163,10 @@ fun NotificationCard(message: String, time: String) {
 
             Text(
                 text = message,
-                style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor, fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = TypographyColor,
+                    fontWeight = FontWeight.Bold
+                ),
                 modifier = Modifier.weight(1f),
                 maxLines = Int.MAX_VALUE,
                 overflow = TextOverflow.Visible
@@ -140,7 +174,10 @@ fun NotificationCard(message: String, time: String) {
 
             Text(
                 text = time,
-                style = MaterialTheme.typography.bodySmall.copy(color = TypographyColor, fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = TypographyColor,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
