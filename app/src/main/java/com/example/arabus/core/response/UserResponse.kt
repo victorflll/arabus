@@ -1,13 +1,27 @@
 package com.example.arabus.core.response
 
-import com.example.arabus.core.dtos.UserDto
+import com.example.arabus.core.domain.user.User
+import java.time.LocalDateTime
+import java.util.UUID
 
 data class UserResponse(
-    val id: String,
+    val id: UUID,
     val email: String,
-    val password: String
+    val token: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val profile: ProfileResponse,
+    val role: RoleResponse
 ) {
-    fun toModel(): UserDto {
-        return UserDto(id = this.id, email = this.email)
+    fun toEntity(): User {
+        return User(
+            this.id,
+            this.email,
+            this.token,
+            this.createdAt,
+            this.updatedAt,
+            this.profile.toEntity(),
+            this.role.toEntity()
+        )
     }
 }
