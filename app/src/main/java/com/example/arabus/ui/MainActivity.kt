@@ -91,11 +91,6 @@ private fun App() {
         }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
-        composable(ProfileScreenPath) {
-            val viewModelStoreOwner = LocalViewModelStoreOwner.current
-            viewModelStoreOwner?.let { owner ->
-                ProfileScreen(navController = navController)
-            }
-        }
+        composable(ProfileScreenPath) { ProfileScreen(navController)}
     }
 }

@@ -32,6 +32,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,16 +44,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.domain.user.User
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.LoadAsset
+import com.example.arabus.ui.view.UserViewModel
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
+    val userViewModel: UserViewModel = viewModel()
+    var user by rememberSaveable { mutableStateOf<User?>(null) }
+
+    LaunchedEffect(Unit) {
+        userViewModel.getUser { userFetched ->
+            if (userFetched != null) {
+                user = userFetched
+            }
+        }
+    }
+
     ArabusTheme {
         AppScaffold(navController = navController) {
             Column(
@@ -70,7 +89,7 @@ fun ProfileScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                ProfileButtonsSection(navController)
+                ProfileButtonsSection(navController, user)
             }
         }
     }
@@ -101,7 +120,7 @@ fun ProfileHeader() {
 }
 
 @Composable
-fun ProfileButtonsSection(navController: NavHostController) {
+fun ProfileButtonsSection(navController: NavHostController, user: User?) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -129,11 +148,11 @@ fun ProfileButtonsSection(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Nome do Usuário",
+                    text = user?.profile?.name ?: "Nome não disponível",
                     style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
                 )
                 Text(
-                    text = "(99) 99999-9999",
+                    text = user?.profile?.phone ?: "Número não disponível",
                     style = MaterialTheme.typography.bodyMedium.copy(color = TypographyColor)
                 )
             }
