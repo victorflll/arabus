@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
@@ -21,11 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.request.UserRequest
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.view.UserViewModel
-import com.example.arabus.ui.view.ProfileViewModel
 import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.components.AppButton
@@ -64,22 +63,37 @@ fun ViewRegisterScreen(navController: NavHostController) {
         return when {
             fullName.value.isBlank() -> {
                 generalError.value = "Por favor, preencha o campo Nome completo."
+                if (isTalkBackEnabled) {
+                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
+                }
                 false
             }
             phone.value.isBlank() -> {
                 generalError.value = "Por favor, preencha o campo Telefone."
+                if (isTalkBackEnabled) {
+                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
+                }
                 false
             }
             email.value.isBlank() -> {
                 generalError.value = "Por favor, preencha o campo E-mail."
+                if (isTalkBackEnabled) {
+                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
+                }
                 false
             }
             password.value.isBlank() || confirmPassword.value.isBlank() -> {
                 generalError.value = "Por favor, preencha os campos de senha."
+                if (isTalkBackEnabled) {
+                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
+                }
                 false
             }
             password.value != confirmPassword.value -> {
                 generalError.value = "As senhas não coincidem."
+                if (isTalkBackEnabled) {
+                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
+                }
                 false
             }
             else -> {
@@ -135,11 +149,13 @@ fun ViewRegisterScreen(navController: NavHostController) {
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
                                     navController.navigate("login_route")
+                                    Toast.makeText(context, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
                                     generalError.value = e.message
+                                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

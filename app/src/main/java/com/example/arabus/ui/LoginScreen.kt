@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -99,26 +100,44 @@ fun ViewLoginScreen(navController: NavHostController) {
                             loginError.value = null
                             coroutineScope.launch {
                                 try {
-                                    userViewModel.login(LoginRequest(username.value, password.value)) { token ->
+                                    userViewModel.login(
+                                        LoginRequest(
+                                            username.value,
+                                            password.value
+                                        )
+                                    ) { token ->
                                         if (token != null) {
                                             coroutineScope.launch(Dispatchers.Main) {
-                                                navController.navigate("home")
                                                 userViewModel.getUser {
                                                     UserManager.name = it?.profile?.name
                                                     UserManager.email = it?.email
                                                 }
+                                                navController.navigate("home")
+                                                Toast.makeText(
+                                                    context,
+                                                    "Login bem-sucedido",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         } else {
                                             coroutineScope.launch(Dispatchers.Main) {
                                                 isLoading.value = false
-                                                loginError.value = "Credenciais inválidas. Tente novamente."
+                                                Toast.makeText(
+                                                    context,
+                                                    "Credenciais inválidas",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
                                         isLoading.value = false
-                                        loginError.value = "Erro inesperado."
+                                        Toast.makeText(
+                                            context,
+                                            "Erro inesperado.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
@@ -216,9 +235,11 @@ fun LoginForm(
 
         TextButton(
             onClick = onForgotPasswordClick,
-            modifier = Modifier.align(Alignment.End).semantics {
-                contentDescription = "Botão para recuperar senha"
-            }
+            modifier = Modifier
+                .align(Alignment.End)
+                .semantics {
+                    contentDescription = "Botão para recuperar senha"
+                }
         ) {
             Text(
                 text = "Esqueceu a senha?",
