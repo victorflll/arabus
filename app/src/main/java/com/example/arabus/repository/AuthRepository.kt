@@ -8,7 +8,19 @@ class AuthRepository : IAuthRepository {
     private val api = RetrofitInstance.auth
 
     override suspend fun login(loginRequest: LoginRequest): String {
-        val response = api.login(loginRequest)
-        return response.token
+        try {
+            val response = api.login(loginRequest)
+            if (response.isSuccessful) {
+                val token = response.body()!!.token
+                return token
+            } else {
+                val errorCode = response.code()
+                val errorBody = response.errorBody()?.string()
+
+                throw Exception("Erro de API: Código $errorCode - $errorBody")
+            }
+        } catch (e: Exception) {
+            throw Exception("Erro ao fazer login: ${e.message}")
+        }
     }
 }

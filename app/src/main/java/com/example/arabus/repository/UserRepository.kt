@@ -11,14 +11,40 @@ class UserRepository : IUserRepository {
     private val api = RetrofitInstance.user
 
     override suspend fun getUser(): User? {
-        val response: UserResponse = api.getUser() ?: return null
-        return response.toEntity()
+        try {
+            val response = api.getUser()
+
+            if (response.isSuccessful) {
+                val user = response.body()?.toEntity()
+                return user
+            } else {
+                val errorCode = response.code()
+                val errorBody = response.errorBody()?.string()
+
+                throw Exception("Erro de API: Código $errorCode - $errorBody")
+            }
+        } catch (e: Exception) {
+            throw Exception("Erro ao buscar usuário: ${e.message}")
+        }
     }
 
     override suspend fun createUser(user: UserRequest): UUID {
-        val response = api.createUser(user)
-        //TODO: SALVAR NO SHARED PREFERENCES
-        return response.id
+        try {
+            val response = api.createUser(user)
+
+            if (response.isSuccessful) {
+                //TODO: SALVAR NO SHARED PREFERENCES
+                val id = response.body()!!.id
+                return id
+            } else {
+                val errorCode = response.code()
+                val errorBody = response.errorBody()?.string()
+
+                throw Exception("Erro de API: Código $errorCode - $errorBody")
+            }
+        } catch (e: Exception) {
+            throw Exception("Erro ao criar usuário: ${e.message}")
+        }
     }
 }
 

@@ -113,7 +113,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                         isLoading.value = true
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                registerUser(userViewModel,
+                                userViewModel.createUser(
                                     UserRequest(
                                         email.value,
                                         password.value,
@@ -129,7 +129,7 @@ fun ViewRegisterScreen(navController: NavHostController) {
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
-                                    generalError.value = "Algo deu errado! Tente novamente."
+                                    generalError.value = e.message
                                 }
                             }
                         }
@@ -141,19 +141,6 @@ fun ViewRegisterScreen(navController: NavHostController) {
                 onSignupClick = { navController.navigate("login_route") },
                 modifier = Modifier.align(Alignment.Start)
             )
-        }
-    }
-}
-
-suspend fun registerUser(viewModel: UserViewModel, user: UserRequest): Boolean {
-    return withContext(Dispatchers.IO) {
-        try {
-            viewModel.createUser(user) { userId ->
-                println("Usuário criado com ID: $userId")
-            }
-            true
-        } catch (e: Exception) {
-            false
         }
     }
 }
