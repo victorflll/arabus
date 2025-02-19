@@ -4,30 +4,44 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.arabus.core.domain.user.User
+import com.example.arabus.core.request.LoginRequest
 import com.example.arabus.core.request.UserRequest
 import com.example.arabus.ui.DIContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = DIContainer.getUserRepository()
+    private val authRepository = DIContainer.getAuthRepository()
 
-    fun createUser(user: UserRequest, onResult: (UUID) -> Unit) {
+    suspend fun createUser(user: UserRequest): UUID {
+        return try {
+            userRepository.createUser(user)
+        } catch (e: Exception) {
+            throw Exception("Erro ao criar usuário", e)
+        }
+    }
+
+    fun login(login: LoginRequest,onResult: (String?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userId = userRepository.createUser(user)
-
-            withContext(Dispatchers.Main) {
-                onResult(userId)
+            try {
+                val token = authRepository.login(login)
+                onResult(token)
+            } catch (_: Exception) {
+                onResult(null)
             }
         }
     }
 
     fun getUser(onResult: (User?) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            val user = userRepository.getUser()
-            onResult(user)
+            try {
+                val user = userRepository.getUser()
+                onResult(user)
+            } catch (_: Exception) {
+                onResult(null)
+            }
         }
     }
 
