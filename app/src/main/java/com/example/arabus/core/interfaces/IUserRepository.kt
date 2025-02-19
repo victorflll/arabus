@@ -1,7 +1,7 @@
 package com.example.arabus.core.interfaces
 
+import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.request.UserRequest
-import com.example.arabus.repository.internal.entities.User
 import java.util.UUID
 
 interface IUserRepository {
