@@ -105,18 +105,17 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
             } else {
                 LazyColumn(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
                     items(routes.size) { i ->
-                        val route = routes[i].route
-                        val address = routes[i]
+                        val route = routes[i]
                         BuildCard(
-                            routeName = "Rota ${route.routeCode}",
+                            routeName = "Rota ${route.code}",
                             startTime = route.startedAt.toFormattedTime(),
                             endTime = route.finishedAt.toFormattedTime(),
-                            startLocation = address.startStreet,
-                            endLocation = address.endStreet,
+                            startLocation = route.origin.street,
+                            endLocation = route.destination.street,
                             duration = route.finishedAt.timeDifference(route.startedAt),
-                            fareInfo = route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                            rating = "4.5",
-                            logo = route.pictureUri ?: "arabus-logo",
+                            fareInfo = route.cost.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                            rating = route.rating.toString(),
+                            logo = "arabus-logo",
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }

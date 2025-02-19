@@ -55,6 +55,7 @@ import com.example.arabus.ui.utils.timeDifference
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.RouteViewModel
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,19 +114,19 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                 LazyColumn {
                     items(history.size) { index ->
                         val historyItem = history[index]
-                        val routeItem = routes.find { it.route.id == historyItem.routeId }
+                        val routeItem = routes.find { it.id == "2909afas" as UUID }
 
                         if (routeItem != null) {
                             BuildCard(
-                                routeName = "Rota ${routeItem.route.routeCode}",
-                                startTime = routeItem.route.startedAt.toFormattedTime(),
-                                endTime = routeItem.route.finishedAt.toFormattedTime(),
-                                startLocation = routeItem.startStreet,
-                                endLocation = routeItem.endStreet,
-                                duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
-                                fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                                routeName = "Rota ${routeItem.code}",
+                                startTime = routeItem.startedAt.toFormattedTime(),
+                                endTime = routeItem.finishedAt.toFormattedTime(),
+                                startLocation = routeItem.origin.street,
+                                endLocation = routeItem.destination.street,
+                                duration = routeItem.finishedAt.timeDifference(routeItem.startedAt),
+                                fareInfo = routeItem.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
                                 rating = "4.$index",
-                                logo = routeItem.route.pictureUri ?: "arabus-logo",
+                                logo = routeItem.pictureUri ?: "arabus-logo",
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))

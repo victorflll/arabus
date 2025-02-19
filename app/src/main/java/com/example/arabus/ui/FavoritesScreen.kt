@@ -89,20 +89,20 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                     ) {
                         items(favorites.size) { i ->
                             val route = favorites[i].route
-                            FavoriteRouteCard(
-                                FavoriteRoute(
-                                    startTime = route.route.startedAt.toFormattedTime(),
-                                    endTime = route.route.finishedAt.toFormattedTime(),
-                                    startLocation = route.startStreet,
-                                    endLocation = route.endStreet,
-                                    duration = route.route.finishedAt.timeDifference(route.route.startedAt),
-                                    price = route.route.cost?.takeIf { it > 0 }
-                                        ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                    logo = route.route.pictureUri ?: "arabus-logo",
-                                    line = "Rota ${route.route.routeCode}",
-                                    rating = "Rota ${route.route.routeCode}",
-                                )
-                            )
+//                            FavoriteRouteCard(
+//                                FavoriteRoute(
+//                                    startTime = route.startedAt.toFormattedTime(),
+//                                    endTime = route.finishedAt.toFormattedTime(),
+//                                    startLocation = route.origin.street,
+//                                    endLocation = route.destination.street,
+//                                    duration = route.finishedAt.timeDifference(route.startedAt),
+//                                    price = route.cost?.takeIf { it > 0 }
+//                                        ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+//                                    logo = route.pictureUri ?: "arabus-logo",
+//                                    line = "Rota ${route.code}",
+//                                    rating = "Rota ${route.code}",
+//                                )
+//                            )
                         }
                     }
                 }
