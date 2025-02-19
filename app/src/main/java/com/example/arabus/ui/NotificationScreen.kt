@@ -21,8 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -33,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.R
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.domain.notification.NotificationDomain
+import com.example.arabus.core.request.NotificationRequest
 import com.example.arabus.repository.internal.entities.Notification
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
@@ -41,15 +46,16 @@ import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.NotificationViewModel
 import java.util.Date
+import java.util.UUID
 
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
-    val notifications = remember { mutableStateListOf<Notification>() }
+    val userMockId = UUID.randomUUID()
+    var notifications by remember { mutableStateOf(emptyList<NotificationDomain>()) }
 
     LaunchedEffect(Unit) {
-        viewModel.getNotificationsByUserId(1) { fetchedNotifications ->
-            notifications.clear()
-            notifications.addAll(fetchedNotifications)
+        viewModel.getNotificationsByUserId(NotificationRequest(userMockId)) { fetchedNotifications ->
+            notifications = fetchedNotifications
         }
     }
 
@@ -61,9 +67,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                     .verticalScroll(rememberScrollState())
             ) {
                 Spacer(modifier = Modifier.height(36.dp))
-
                 NotificationHeader()
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (notifications.isEmpty()) {
