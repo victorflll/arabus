@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.application.service.user.RegisterService
+import com.example.arabus.core.domain.user.User
+import com.example.arabus.core.request.UserRequest
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.view.UserViewModel
 import com.example.arabus.ui.components.AppTextField
@@ -28,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 private val TitleStyle = TextStyle(
     fontSize = 26.sp,
@@ -40,8 +42,6 @@ private val SubtitleFontSize = 16.sp
 @Composable
 fun ViewRegisterScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
-    val registerService = remember { RegisterService(userViewModel, profileViewModel) }
 
     val fullName = remember { mutableStateOf("") }
     val phone = remember { mutableStateOf("") }
@@ -113,11 +113,14 @@ fun ViewRegisterScreen(navController: NavHostController) {
                         isLoading.value = true
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                registerService.registerUser(
-                                    fullName.value,
-                                    phone.value,
-                                    email.value,
-                                    password.value
+                                registerUser(userViewModel,
+                                    UserRequest(
+                                        email.value,
+                                        password.value,
+                                        UUID.randomUUID(),
+                                        fullName.value,
+                                        phone.value
+                                    )
                                 )
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
@@ -138,6 +141,19 @@ fun ViewRegisterScreen(navController: NavHostController) {
                 onSignupClick = { navController.navigate("login_route") },
                 modifier = Modifier.align(Alignment.Start)
             )
+        }
+    }
+}
+
+suspend fun registerUser(viewModel: UserViewModel, user: UserRequest): Boolean {
+    return withContext(Dispatchers.IO) {
+        try {
+            viewModel.createUser(user) { userId ->
+                println("Usuário criado com ID: $userId")
+            }
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 }

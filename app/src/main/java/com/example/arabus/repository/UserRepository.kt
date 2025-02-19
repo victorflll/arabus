@@ -17,6 +17,7 @@ class UserRepository : IUserRepository {
 
     override suspend fun createUser(user: UserRequest): UUID {
         val response = api.createUser(user)
+        //TODO: SALVAR NO SHARED PREFERENCES
         return response.id
     }
 }

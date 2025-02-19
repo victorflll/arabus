@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.application.service.user.AuthService
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
@@ -47,7 +46,6 @@ private val HorizontalPadding = 16.dp
 @Composable
 fun ViewLoginScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
-    val authService = remember { AuthService(userViewModel) }
 
     val username = remember { mutableStateOf("admin@gmail.com") }
     val password = remember { mutableStateOf("admin123") }
@@ -88,14 +86,14 @@ fun ViewLoginScreen(navController: NavHostController) {
                             isLoading.value = true
                             loginError.value = null
                             coroutineScope.launch {
-                                val isValid =
-                                    authService.validateCredentials(username.value, password.value)
-                                if (isValid) {
-                                    navController.navigate("home")
-                                } else {
-                                    isLoading.value = false
-                                    loginError.value = "Credenciais inválidas. Tente novamente."
-                                }
+//                                val isValid =
+//                                    authService.validateCredentials(username.value, password.value)
+//                                if (isValid) {
+//                                    navController.navigate("home")
+//                                } else {
+//                                    isLoading.value = false
+//                                    loginError.value = "Credenciais inválidas. Tente novamente."
+//                                }
                             }
                         }
                     }
