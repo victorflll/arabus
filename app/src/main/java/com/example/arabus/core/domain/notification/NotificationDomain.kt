@@ -8,5 +8,6 @@ data class NotificationDomain(
     val userId: UUID,
     val title: String,
     val message: String,
-    val timestamp: LocalDateTime
+    val createdAt: LocalDateTime,
+    val read: Boolean,
 )

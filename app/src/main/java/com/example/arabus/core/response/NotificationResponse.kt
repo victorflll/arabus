@@ -11,8 +11,9 @@ data class NotificationResponse(
     val userId: UUID,
     val title: String,
     val message: String,
-    @SerializedName("timestamp")
-    val timestamp: String
+    @SerializedName("created_at")
+    val createdAt: String,
+    val read: Boolean
 ) {
     fun toDomain(): NotificationDomain {
         return NotificationDomain(
@@ -20,7 +21,8 @@ data class NotificationResponse(
             userId = this.userId,
             title = this.title,
             message = this.message,
-            timestamp = LocalDateTime.parse(this.timestamp)
+            createdAt = LocalDateTime.parse(this.createdAt),
+            read = this.read
         )
     }
 }
