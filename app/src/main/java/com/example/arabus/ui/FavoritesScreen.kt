@@ -1,32 +1,14 @@
 package com.example.arabus.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
@@ -34,22 +16,26 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.domain.favorite.FavoriteDomain
+import com.example.arabus.core.request.FavoriteRequest
 import com.example.arabus.ui.components.AppOriginToDestination
-import com.example.arabus.ui.theme.AppBlack
-import com.example.arabus.ui.theme.AppGreenOpacity
-import com.example.arabus.ui.theme.TypographyColor
+import com.example.arabus.ui.theme.*
 import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.utils.timeDifference
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.FavoriteViewModel
+import java.util.UUID
 
 @Composable
 fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
-    val favorites by viewModel.favorites.collectAsState()
+    val userMockId = UUID.randomUUID()
     val isLoading by viewModel.isLoading.collectAsState()
+    var favorites by rememberSaveable { mutableStateOf(emptyList<FavoriteDomain>()) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadFavorites()
+        viewModel.getFavoritesByUserId(FavoriteRequest(userMockId)) { favoriteList ->
+            favorites = favoriteList
+        }
     }
 
     AppScaffold(navController = navController) { innerPadding ->
@@ -64,46 +50,45 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if (favorites.isEmpty()) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("Nenhuma rota favoritada.")
-                    }
-                } else {
-                    LazyColumn(
-                        modifier = Modifier.padding(
-                            top = 16.dp,
-                            start = 16.dp,
-                            end = 16.dp
-                        )
-                    ) {
-                        items(favorites.size) { i ->
-                            val route = favorites[i].route
-                            FavoriteRouteCard(
-                                FavoriteRoute(
-                                    startTime = route.route.startedAt.toFormattedTime(),
-                                    endTime = route.route.finishedAt.toFormattedTime(),
-                                    startLocation = route.startStreet,
-                                    endLocation = route.endStreet,
-                                    duration = route.route.finishedAt.timeDifference(route.route.startedAt),
-                                    price = route.route.cost?.takeIf { it > 0 }
-                                        ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                    logo = route.route.pictureUri ?: "arabus-logo",
-                                    line = "Rota ${route.route.routeCode}",
-                                    rating = "Rota ${route.route.routeCode}",
-                                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (favorites.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Nenhuma rota favoritada.")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.padding(
+                        top = 16.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    )
+                ) {
+                    items(favorites.size) { i ->
+                        val route = favorites[i].route
+                        FavoriteRouteCard(
+                            FavoriteRoute(
+                                startTime = route.startedAt.toFormattedTime(),
+                                endTime = route.finishedAt.toFormattedTime(),
+                                startLocation = route.origin.street,
+                                endLocation = route.destination.street,
+                                duration = route.finishedAt.timeDifference(route.startedAt),
+                                price = route.cost?.takeIf { it > 0 }
+                                    ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                                logo = route.pictureUri ?: "arabus-logo",
+                                line = "Rota ${route.code}",
+                                rating = "4.$i",
                             )
-                        }
+                        )
+                    }
                     }
                 }
             }
