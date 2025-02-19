@@ -3,7 +3,9 @@ package com.example.arabus.ui
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.*
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.application.service.user.RegisterService
+import com.example.arabus.core.request.UserRequest
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.view.UserViewModel
-import com.example.arabus.ui.view.ProfileViewModel
 import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.components.AppButton
@@ -31,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 private val TitleStyle = TextStyle(
     fontSize = 26.sp,
@@ -47,8 +49,6 @@ fun ViewRegisterScreen(navController: NavHostController) {
     val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
 
     val userViewModel: UserViewModel = viewModel()
-    val profileViewModel: ProfileViewModel = viewModel()
-    val registerService = remember { RegisterService(userViewModel, profileViewModel) }
 
     val fullName = remember { mutableStateOf("") }
     val phone = remember { mutableStateOf("") }
@@ -137,26 +137,25 @@ fun ViewRegisterScreen(navController: NavHostController) {
                         isLoading.value = true
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
-                                registerService.registerUser(
-                                    fullName.value,
-                                    phone.value,
-                                    email.value,
-                                    password.value
+                                userViewModel.createUser(
+                                    UserRequest(
+                                        email.value,
+                                        password.value,
+                                        UUID.randomUUID(),
+                                        fullName.value,
+                                        phone.value
+                                    )
                                 )
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
                                     navController.navigate("login_route")
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(context, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
-                                    }
+                                    Toast.makeText(context, "Cadastro realizado com sucesso", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
                                 withContext(Dispatchers.Main) {
                                     isLoading.value = false
-                                    generalError.value = "Algo deu errado! Tente novamente."
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
-                                    }
+                                    generalError.value = e.message
+                                    Toast.makeText(context, generalError.value, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }

@@ -1,9 +1,24 @@
 package com.example.arabus.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,14 +34,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.arabus.application.service.user.AuthService
+import com.example.arabus.core.network.UserManager
+import com.example.arabus.core.request.LoginRequest
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.view.UserViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val TitleStyle =
     TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
@@ -41,10 +59,9 @@ fun ViewLoginScreen(navController: NavHostController) {
     val isTalkBackEnabled = sharedPrefManager.isTalkBackEnabled()
 
     val userViewModel: UserViewModel = viewModel()
-    val authService = remember { AuthService(userViewModel) }
 
-    val username = remember { mutableStateOf("admin@gmail.com") }
-    val password = remember { mutableStateOf("admin123") }
+    val username = remember { mutableStateOf("joao@example.com") }
+    val password = remember { mutableStateOf("1234") }
     val isLoading = remember { mutableStateOf(false) }
     val loginError = remember { mutableStateOf<String?>(null) }
 
@@ -78,30 +95,54 @@ fun ViewLoginScreen(navController: NavHostController) {
                     onLoginClick = {
                         if (username.value.isBlank() || password.value.isBlank()) {
                             loginError.value = "Preencha todos os campos."
-                            if (isTalkBackEnabled) {
-                                Toast.makeText(context, "Preencha todos os campos", Toast.LENGTH_SHORT).show()
-                            }
                         } else {
                             isLoading.value = true
                             loginError.value = null
                             coroutineScope.launch {
-                                val isValid =
-                                    authService.validateCredentials(username.value, password.value)
-                                if (isValid) {
-                                    navController.navigate("home")
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(context, "Login bem-sucedido", Toast.LENGTH_SHORT).show()
+                                try {
+                                    userViewModel.login(
+                                        LoginRequest(
+                                            username.value,
+                                            password.value
+                                        )
+                                    ) { token ->
+                                        if (token != null) {
+                                            coroutineScope.launch(Dispatchers.Main) {
+                                                userViewModel.getUser {
+                                                    UserManager.name = it?.profile?.name
+                                                    UserManager.email = it?.email
+                                                }
+                                                navController.navigate("home")
+                                                Toast.makeText(
+                                                    context,
+                                                    "Login bem-sucedido",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        } else {
+                                            coroutineScope.launch(Dispatchers.Main) {
+                                                isLoading.value = false
+                                                Toast.makeText(
+                                                    context,
+                                                    "Credenciais inválidas",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
                                     }
-                                } else {
-                                    isLoading.value = false
-                                    loginError.value = "Credenciais inválidas. Tente novamente."
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(context, "Credenciais inválidas", Toast.LENGTH_SHORT).show()
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        isLoading.value = false
+                                        Toast.makeText(
+                                            context,
+                                            "Erro inesperado.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
                         }
-                    },
+                    }
                 )
             }
 
@@ -194,9 +235,11 @@ fun LoginForm(
 
         TextButton(
             onClick = onForgotPasswordClick,
-            modifier = Modifier.align(Alignment.End).semantics {
-                contentDescription = "Botão para recuperar senha"
-            }
+            modifier = Modifier
+                .align(Alignment.End)
+                .semantics {
+                    contentDescription = "Botão para recuperar senha"
+                }
         ) {
             Text(
                 text = "Esqueceu a senha?",
