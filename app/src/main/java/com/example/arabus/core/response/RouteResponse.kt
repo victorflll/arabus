@@ -8,7 +8,8 @@ import java.util.UUID
 
 
 data class RouteResponse(
-    val routeCode: String,
+    val id: String,
+    val code: String,
     val origin: Location,
     val destination: Location,
     @SerializedName("started_at")
@@ -17,8 +18,6 @@ data class RouteResponse(
     val finishedAt: String,
     val available: Boolean,
     val cost: Double,
-    @SerializedName("picture_uri")
-    val pictureUri: String,
     val rating: Double?
 ) {
     fun toEntity(): Route {
@@ -35,15 +34,15 @@ data class RouteResponse(
         )
 
         return Route(
-            id = UUID.randomUUID(),
+            id = UUID.fromString(this.id),
             available = this.available,
             cost = this.cost,
             origin = originLocation,
             destination = destinationLocation,
             startedAt = LocalDateTime.parse(this.startedAt),
             finishedAt = LocalDateTime.parse(this.finishedAt),
-            code = this.routeCode,
-            pictureUri = this.pictureUri ?: "",
+            code = this.code,
+            pictureUri = "arabus-logo",
             rating = this.rating ?: 0.0
         )
     }

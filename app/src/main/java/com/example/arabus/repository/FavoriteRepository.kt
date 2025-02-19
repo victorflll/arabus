@@ -14,7 +14,7 @@ class FavoriteRepository : IFavoriteRepository {
     }
 
     override suspend fun getFavoritesByUserId(favoriteRequest: FavoriteRequest): List<FavoriteDomain> {
-        val response = api.getFavoritesByUserId(favoriteRequest.toString())
+        val response = api.getFavoritesByUserId(favoriteRequest.userId.toString())
         return response.body()?.map { it.toEntity() } ?: emptyList()
     }
 }
