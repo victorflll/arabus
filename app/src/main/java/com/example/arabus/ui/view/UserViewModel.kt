@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.arabus.core.domain.user.User
+import com.example.arabus.core.request.LoginRequest
 import com.example.arabus.core.request.UserRequest
 import com.example.arabus.ui.DIContainer
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,7 @@ import java.util.UUID
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val userRepository = DIContainer.getUserRepository()
+    private val authRepository = DIContainer.getAuthRepository()
 
     fun createUser(user: UserRequest, onResult: (UUID) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -21,6 +23,13 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             withContext(Dispatchers.Main) {
                 onResult(userId)
             }
+        }
+    }
+
+    fun login(login: LoginRequest,onResult: (String?) -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val token = authRepository.login(login)
+            onResult(token)
         }
     }
 

@@ -30,12 +30,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.arabus.core.request.LoginRequest
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.view.UserViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val TitleStyle =
     TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
@@ -47,8 +50,8 @@ private val HorizontalPadding = 16.dp
 fun ViewLoginScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
 
-    val username = remember { mutableStateOf("admin@gmail.com") }
-    val password = remember { mutableStateOf("admin123") }
+    val username = remember { mutableStateOf("victorrrr@gmail.com") }
+    val password = remember { mutableStateOf("1234") }
     val isLoading = remember { mutableStateOf(false) }
     val loginError = remember { mutableStateOf<String?>(null) }
 
@@ -86,14 +89,25 @@ fun ViewLoginScreen(navController: NavHostController) {
                             isLoading.value = true
                             loginError.value = null
                             coroutineScope.launch {
-//                                val isValid =
-//                                    authService.validateCredentials(username.value, password.value)
-//                                if (isValid) {
-//                                    navController.navigate("home")
-//                                } else {
-//                                    isLoading.value = false
-//                                    loginError.value = "Credenciais inválidas. Tente novamente."
-//                                }
+                                try {
+                                    userViewModel.login(LoginRequest(username.value, password.value)) { token ->
+                                        if (token != null) {
+                                            coroutineScope.launch(Dispatchers.Main) {
+                                                navController.navigate("home")
+                                            }
+                                        } else {
+                                            coroutineScope.launch(Dispatchers.Main) {
+                                                isLoading.value = false
+                                                loginError.value = "Credenciais inválidas. Tente novamente."
+                                            }
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        isLoading.value = false
+                                        loginError.value = "Erro inesperado."
+                                    }
+                                }
                             }
                         }
                     }
