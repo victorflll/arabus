@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.arabus.core.network.UserManager
 import com.example.arabus.core.request.LoginRequest
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
@@ -50,7 +51,7 @@ private val HorizontalPadding = 16.dp
 fun ViewLoginScreen(navController: NavHostController) {
     val userViewModel: UserViewModel = viewModel()
 
-    val username = remember { mutableStateOf("victorrrr@gmail.com") }
+    val username = remember { mutableStateOf("joao@example.com") }
     val password = remember { mutableStateOf("1234") }
     val isLoading = remember { mutableStateOf(false) }
     val loginError = remember { mutableStateOf<String?>(null) }
@@ -94,6 +95,10 @@ fun ViewLoginScreen(navController: NavHostController) {
                                         if (token != null) {
                                             coroutineScope.launch(Dispatchers.Main) {
                                                 navController.navigate("home")
+                                                userViewModel.getUser {
+                                                    UserManager.name = it?.profile?.name
+                                                    UserManager.email = it?.email
+                                                }
                                             }
                                         } else {
                                             coroutineScope.launch(Dispatchers.Main) {

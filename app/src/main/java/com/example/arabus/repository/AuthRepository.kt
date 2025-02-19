@@ -1,7 +1,9 @@
 package com.example.arabus.repository
 
 import com.example.arabus.core.interfaces.IAuthRepository
+import com.example.arabus.core.network.RetrofitBuilder
 import com.example.arabus.core.network.RetrofitInstance
+import com.example.arabus.core.network.UserManager
 import com.example.arabus.core.request.LoginRequest
 
 class AuthRepository : IAuthRepository {
@@ -12,6 +14,8 @@ class AuthRepository : IAuthRepository {
             val response = api.login(loginRequest)
             if (response.isSuccessful) {
                 val token = response.body()!!.token
+                UserManager.token = token
+                RetrofitBuilder.setAuthToken(token)
                 return token
             } else {
                 val errorCode = response.code()

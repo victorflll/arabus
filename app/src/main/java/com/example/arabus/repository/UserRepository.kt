@@ -4,7 +4,6 @@ import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.interfaces.IUserRepository
 import com.example.arabus.core.network.RetrofitInstance
 import com.example.arabus.core.request.UserRequest
-import com.example.arabus.core.response.UserResponse
 import java.util.UUID
 
 class UserRepository : IUserRepository {
@@ -33,7 +32,6 @@ class UserRepository : IUserRepository {
             val response = api.createUser(user)
 
             if (response.isSuccessful) {
-                //TODO: SALVAR NO SHARED PREFERENCES
                 val id = response.body()!!.id
                 return id
             } else {
