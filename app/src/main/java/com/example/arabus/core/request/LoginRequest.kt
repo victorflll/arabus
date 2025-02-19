@@ -1,4 +1,6 @@
 package com.example.arabus.core.request
 
-class LoginRequest {
-}
+data class LoginRequest(
+    val email: String,
+    val password: String
+)

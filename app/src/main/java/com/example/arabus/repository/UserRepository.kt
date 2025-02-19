@@ -16,7 +16,8 @@ class UserRepository : IUserRepository {
     }
 
     override suspend fun createUser(user: UserRequest): UUID {
-        TODO("Not yet implemented")
+        val response = api.createUser(user)
+        return response.id
     }
 }
 

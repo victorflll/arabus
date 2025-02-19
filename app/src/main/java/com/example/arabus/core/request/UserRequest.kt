@@ -1,4 +1,11 @@
 package com.example.arabus.core.request
 
-class UserRequest {
-}
+import java.util.UUID
+
+data class UserRequest(
+    val email: String,
+    val password: String,
+    val roleId: UUID,
+    val name: String,
+    val phoneNumber: String
+)
