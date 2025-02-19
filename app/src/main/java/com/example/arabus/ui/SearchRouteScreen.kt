@@ -1,33 +1,21 @@
 package com.example.arabus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -38,6 +26,7 @@ import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
+import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -49,6 +38,10 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchRouteScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
+    val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
+
     var origin = remember { mutableStateOf("") }
     var destination = remember { mutableStateOf("") }
 
@@ -62,11 +55,19 @@ fun SearchRouteScreen(navController: NavHostController) {
                     titleContentColor = AppWhite,
                     actionIconContentColor = AppGreen
                 ),
-                title = { Text("Buscar rotas") },
+                title = {
+                    Text(
+                        "Buscar rotas",
+                        modifier = Modifier.semantics {
+                            contentDescription = "Tela de busca de rotas"
+                        }
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.semantics { contentDescription = "Botão voltar" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Localized description"
@@ -82,8 +83,7 @@ fun SearchRouteScreen(navController: NavHostController) {
                 .padding(innerPadding)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 Box(
                     modifier = Modifier
@@ -109,6 +109,9 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 placeholder = "Seu local",
                                 textState = origin.value,
                                 onValueChange = { origin.value = it },
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Campo de entrada para o local de origem"
+                                },
                                 trailingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Search,
@@ -120,6 +123,9 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 placeholder = "Destino",
                                 textState = destination.value,
                                 onValueChange = { destination.value = it },
+                                modifier = Modifier.semantics {
+                                    contentDescription = "Campo de entrada para o destino"
+                                },
                                 trailingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Search,
@@ -129,11 +135,21 @@ fun SearchRouteScreen(navController: NavHostController) {
                             )
                         }
                         Box(
-                            modifier = Modifier.clickable {
-                                val aux = origin.value
-                                origin.value = destination.value
-                                destination.value = aux
-                            }
+                            modifier = Modifier
+                                .clickable {
+                                    val aux = origin.value
+                                    origin.value = destination.value
+                                    destination.value = aux
+
+                                    if (isTalkBackEnabled) {
+                                        Toast.makeText(
+                                            context,
+                                            "Origem e destino trocados",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                                .semantics { contentDescription = "Botão para inverter origem e destino" }
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.SwapVert,
@@ -150,13 +166,24 @@ fun SearchRouteScreen(navController: NavHostController) {
                 ) {
                     BuildBody()
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         AppButton(
                             title = "Verificar rotas",
-                            onClick = { navController.navigate(ViewRouteScreenPath) }
+                            onClick = {
+                                navController.navigate(ViewRouteScreenPath)
+                                if (isTalkBackEnabled) {
+                                    Toast.makeText(
+                                        context,
+                                        "Procurando rotas...",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier.semantics {
+                                contentDescription = "Botão para verificar rotas disponíveis"
+                            }
                         )
                     }
 
@@ -194,7 +221,9 @@ fun GoogleMapComposable() {
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics { contentDescription = "Mapa interativo para visualizar rotas" },
         properties = mapProperties,
         uiSettings = uiSettings,
         cameraPositionState = mapCamera,

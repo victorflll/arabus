@@ -1,42 +1,23 @@
 package com.example.arabus.ui
 
 import android.app.Application
-import android.util.Log
+import android.content.Context
+import android.view.accessibility.AccessibilityManager
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -83,14 +64,19 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                     titleContentColor = AppWhite,
                     actionIconContentColor = AppGreen
                 ),
-                title = { Text("Histórico de Corridas") },
+                title = {
+                    Text(
+                        "Histórico de Corridas",
+                        modifier = Modifier.semantics { contentDescription = "Histórico de corridas anteriores" }
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar"
+                            contentDescription = "Voltar para a tela anterior"
                         )
                     }
                 },
@@ -107,7 +93,9 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.semantics { contentDescription = "Carregando histórico de corridas..." }
+                    )
                 }
             } else {
                 LazyColumn {
@@ -124,8 +112,8 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                                 endLocation = routeItem.endStreet,
                                 duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
                                 fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                rating = "4.$index",
-                                logo = routeItem.route.pictureUri ?: "arabus-logo",
+                                rating = "Nota: 4.$index",
+                                logo = routeItem.route.pictureUri ?: "arabus-logo"
                             )
                         }
                         Spacer(modifier = Modifier.height(16.dp))
@@ -155,7 +143,11 @@ private fun BuildCard(
             disabledContainerColor = AppGrey,
             disabledContentColor = AppBlack,
         ),
-        modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp),
+        modifier = Modifier
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .semantics {
+                contentDescription = "Histórico de ${routeName}, saída às ${startTime}, chegada às ${endTime}, origem em ${startLocation} e destino ${endLocation}. Duração estimada ${duration}, preço ${fareInfo}, nota ${rating}."
+            },
         border = BorderStroke(1.dp, AppBlack)
     ) {
         Column(
@@ -171,9 +163,9 @@ private fun BuildCard(
                     .padding(horizontal = 16.dp)
             ) {
                 Column {
-                    Text(text = startTime)
+                    Text(text = startTime, modifier = Modifier.semantics { contentDescription = "Horário de saída: $startTime" })
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = endTime)
+                    Text(text = endTime, modifier = Modifier.semantics { contentDescription = "Horário de chegada: $endTime" })
                 }
                 AppOriginToDestination(
                     height = 18.dp,
@@ -181,15 +173,16 @@ private fun BuildCard(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 Column {
-                    Text(text = startLocation)
-                    Text(text = duration, fontSize = TextUnit(8f, TextUnitType.Sp), modifier = Modifier.padding(vertical = 6.dp))
-                    Text(text = endLocation)
+                    Text(text = startLocation, modifier = Modifier.semantics { contentDescription = "Origem: $startLocation" })
+                    Text(
+                        text = duration,
+                        fontSize = TextUnit(8f, TextUnitType.Sp),
+                        modifier = Modifier.padding(vertical = 6.dp).semantics { contentDescription = "Duração: $duration" }
+                    )
+                    Text(text = endLocation, modifier = Modifier.semantics { contentDescription = "Destino: $endLocation" })
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Text(
-                    text = fareInfo,
-                    modifier = Modifier.align(Alignment.Top)
-                )
+                Text(text = fareInfo, modifier = Modifier.semantics { contentDescription = "Preço: $fareInfo" })
             }
             Row(
                 horizontalArrangement = Arrangement.Start,
@@ -201,12 +194,12 @@ private fun BuildCard(
                 LoadAsset.PngExtension(logo, width = 84.dp, height = 84.dp)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.Start) {
-                    Text(text = routeName)
+                    Text(text = routeName, modifier = Modifier.semantics { contentDescription = "Nome da rota: $routeName" })
                     Spacer(modifier = Modifier.height(8.dp))
                     Row {
                         Icon(
                             Icons.Outlined.Star,
-                            contentDescription = null,
+                            contentDescription = "Classificação: $rating",
                             modifier = Modifier.height(16.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
