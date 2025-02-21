@@ -1,18 +1,21 @@
 package com.example.arabus.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -82,18 +85,16 @@ fun ViewRegisterScreen(navController: NavHostController) {
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().semantics {
+            contentDescription = "Tela de cadastro de usuário"
+        },
         color = AppGreen
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .padding(DefaultPadding),
+            modifier = Modifier.fillMaxSize().statusBarsPadding().padding(DefaultPadding),
             verticalArrangement = Arrangement.spacedBy(DefaultPadding)
         ) {
             Header()
-
             RegistrationForm(
                 fullName = fullName,
                 phone = phone,
@@ -102,11 +103,12 @@ fun ViewRegisterScreen(navController: NavHostController) {
                 confirmPassword = confirmPassword,
                 generalError = generalError
             )
-
             AppButton(
                 title = if (isLoading.value) "Aguarde..." else "Cadastrar",
                 fontSize = 24.sp,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().semantics {
+                    contentDescription = "Botão de cadastro de usuário"
+                },
                 padding = PaddingValues(0.dp),
                 onClick = {
                     if (validateFields()) {
@@ -133,7 +135,6 @@ fun ViewRegisterScreen(navController: NavHostController) {
                     }
                 }
             )
-
             LoginFooter(
                 onSignupClick = { navController.navigate("login_route") },
                 modifier = Modifier.align(Alignment.Start)

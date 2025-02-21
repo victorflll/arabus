@@ -2,33 +2,17 @@ package com.example.arabus.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarColors
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.ViewRouteScreenPath
@@ -55,24 +39,22 @@ fun SearchRouteScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                colors = TopAppBarColors(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = AppGreen,
-                    scrolledContainerColor = AppGreen,
-                    navigationIconContentColor = AppWhite,
-                    titleContentColor = AppWhite,
-                    actionIconContentColor = AppGreen
+                    titleContentColor = AppWhite
                 ),
                 title = { Text("Buscar rotas") },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.semantics { contentDescription = "Botão voltar" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Localized description"
+                            contentDescription = "Voltar"
                         )
                     }
-                },
+                }
             )
         },
     ) { innerPadding ->
@@ -80,10 +62,10 @@ fun SearchRouteScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .semantics { contentDescription = "Tela de busca de rotas" }
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 Box(
                     modifier = Modifier
@@ -112,7 +94,7 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 trailingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
+                                        contentDescription = "Ícone de busca de local"
                                     )
                                 }
                             )
@@ -123,7 +105,7 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 trailingIcon = {
                                     Icon(
                                         imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
+                                        contentDescription = "Ícone de busca de destino"
                                     )
                                 }
                             )
@@ -133,11 +115,11 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 val aux = origin.value
                                 origin.value = destination.value
                                 destination.value = aux
-                            }
+                            }.semantics { contentDescription = "Botão para inverter origem e destino" }
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.SwapVert,
-                                contentDescription = "Swap Icon",
+                                contentDescription = "Inverter origem e destino",
                                 tint = AppWhite
                             )
                         }
@@ -156,10 +138,10 @@ fun SearchRouteScreen(navController: NavHostController) {
                     ) {
                         AppButton(
                             title = "Verificar rotas",
-                            onClick = { navController.navigate(ViewRouteScreenPath) }
+                            onClick = { navController.navigate(ViewRouteScreenPath) },
+                            modifier = Modifier.semantics { contentDescription = "Botão para verificar rotas disponíveis" }
                         )
                     }
-
                 }
             }
         }
@@ -168,7 +150,6 @@ fun SearchRouteScreen(navController: NavHostController) {
 
 @Composable
 private fun BuildBody() {
-    //Permissions.RequestInternetPermission()
     Permissions.RequestLocationPermission { GoogleMapComposable() }
 }
 
@@ -194,7 +175,7 @@ fun GoogleMapComposable() {
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().semantics { contentDescription = "Mapa interativo mostrando localização atual" },
         properties = mapProperties,
         uiSettings = uiSettings,
         cameraPositionState = mapCamera,
@@ -204,10 +185,4 @@ fun GoogleMapComposable() {
             true
         }
     )
-}
-
-@Composable
-@Preview
-private fun Preview() {
-    SearchRouteScreen(navController = NavHostController(LocalContext.current))
 }

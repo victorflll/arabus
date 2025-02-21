@@ -1,30 +1,22 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import android.view.accessibility.AccessibilityManager
+import android.content.Context
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,12 +29,25 @@ import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.view.UserViewModel
 import kotlinx.coroutines.launch
+import androidx.core.content.getSystemService
 
 private val TitleStyle =
     TextStyle(fontSize = 26.sp, lineHeight = 32.sp, fontWeight = FontWeight.Bold)
 private val SubtitleFontSize = 16.sp
 private val SpacingBetweenSections = 40.dp
 private val HorizontalPadding = 16.dp
+
+fun announceForAccessibility(context: Context, message: String) {
+    val accessibilityManager = context.getSystemService<AccessibilityManager>()
+    accessibilityManager?.sendAccessibilityEvent(
+        android.view.accessibility.AccessibilityEvent.obtain().apply {
+            eventType = android.view.accessibility.AccessibilityEvent.TYPE_ANNOUNCEMENT
+            className = this@apply::class.java.name
+            packageName = context.packageName
+            text.add(message)
+        }
+    )
+}
 
 @Composable
 fun ViewLoginScreen(navController: NavHostController) {
@@ -125,7 +130,7 @@ fun LoginForm(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
+        LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp, description = "logotipo do Arabus")
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections + 32.dp))
 
@@ -144,6 +149,7 @@ fun LoginForm(
                 .fillMaxWidth(0.7f)
                 .align(Alignment.Start)
                 .padding(start = 14.dp, bottom = HorizontalPadding)
+                .semantics { contentDescription = "Mensagem de boas-vindas ao AraBus: Bem-vindo de volta, siga com o login para o AraBus" }
         )
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections))
@@ -157,6 +163,7 @@ fun LoginForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
+                .semantics { contentDescription = "Campo para inserir o e-mail" }
         )
 
         AppTextField(
@@ -177,12 +184,14 @@ fun LoginForm(
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(top = 8.dp, start = 10.dp)
+                    .semantics { contentDescription = "Erro: $loginError" }
             )
         }
 
         TextButton(
             onClick = onForgotPasswordClick,
             modifier = Modifier.align(Alignment.End)
+                .semantics { contentDescription = "Botão para recuperar senha" }
         ) {
             Text(
                 text = "Esqueceu a senha?",
@@ -202,7 +211,7 @@ fun LoginForm(
                 title = "Login",
                 onClick = onLoginClick,
                 fontSize = TitleStyle.fontSize,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().semantics { stateDescription = "Carregando login..." },
                 padding = PaddingValues(all = 0.dp)
             )
         }
@@ -217,16 +226,23 @@ fun SignupFooter(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 14.dp, bottom = 16.dp),
+            .padding(start = 14.dp, bottom = 16.dp)
+            .semantics { contentDescription = "Seção para usuários sem conta" },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Não tem uma conta?",
             fontSize = SubtitleFontSize,
-            color = Color.White
+            color = Color.White,
+            modifier = Modifier.semantics {
+                contentDescription = "Texto informativo: Não tem uma conta?"
+            }
         )
-        TextButton(onClick = onSignupClick) {
+        TextButton(
+            onClick = onSignupClick,
+            modifier = Modifier.semantics { contentDescription = "Botão para cadastro" }
+        ) {
             Text(
                 text = "Cadastre-se",
                 fontSize = SubtitleFontSize,

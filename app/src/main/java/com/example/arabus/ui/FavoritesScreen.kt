@@ -1,47 +1,40 @@
 package com.example.arabus.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
+import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.utils.timeDifference
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.FavoriteViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
@@ -56,7 +49,8 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
         Surface(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding).semantics {
+                    contentDescription = "Tela de favoritos do aplicativo AraBus"}
         ) {
             Column {
                 Spacer(modifier = Modifier.height(36.dp))
@@ -114,19 +108,21 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
 
 @Composable
 fun FavoritesHeader() {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.semantics {
+        contentDescription = "Cabeçalho da tela de favoritos"
+        heading()
+    }) {
         Icon(
             imageVector = Icons.Outlined.FavoriteBorder,
             contentDescription = "Ícone de favoritos",
-            modifier = Modifier
-                .padding(start = 26.dp)
-                .size(32.dp),
+            modifier = Modifier.padding(start = 26.dp).size(32.dp),
             tint = TypographyColor
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "Favoritos",
-            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
+            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor),
+            modifier = Modifier.semantics { contentDescription = "Título da tela de favoritos" }
         )
     }
 }
@@ -135,10 +131,10 @@ fun FavoritesHeader() {
 fun FavoriteRouteCard(route: FavoriteRoute) {
     Card(
         colors = CardDefaults.cardColors(containerColor = AppGreenOpacity),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp),
-        border = BorderStroke(1.dp, AppBlack)
+        modifier = Modifier.fillMaxWidth().padding(8.dp).semantics {
+            contentDescription = "Cartão da rota favorita ${route.line}"
+            role = Role.Button
+        }, border = BorderStroke(1.dp, AppBlack)
     ) {
         Column(modifier = Modifier.padding(16.dp, 12.dp, 16.dp, 8.dp)) {
             Row(

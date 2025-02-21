@@ -2,39 +2,17 @@ package com.example.arabus.ui
 
 import android.app.Application
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -71,7 +49,10 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                 ),
                 title = { Text("Rotas disponíveis") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.semantics { contentDescription = "Botão voltar" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar"
@@ -85,6 +66,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .semantics { contentDescription = "Tela de rotas disponíveis" }
         ) {
             if (isLoading) {
                 Box(
@@ -126,7 +108,6 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
     }
 }
 
-
 @Composable
 private fun BuildCard(
     routeName: String,
@@ -140,10 +121,9 @@ private fun BuildCard(
     logo: String
 ) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = AppGreenOpacity,
-            contentColor = AppBlack,
-        ),
+        modifier = Modifier
+            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+            .semantics { contentDescription = "Rota disponível - $routeName, de $startLocation para $endLocation, duração $duration, tarifa $fareInfo, avaliação $rating estrelas" },
         border = BorderStroke(1.dp, AppBlack)
     ) {
         Column(
@@ -160,7 +140,7 @@ private fun BuildCard(
                     Row {
                         Icon(
                             Icons.Outlined.Star,
-                            contentDescription = null,
+                            contentDescription = "Ícone de estrela",
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -168,7 +148,7 @@ private fun BuildCard(
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(Icons.Outlined.Favorite, contentDescription = null)
+                Icon(Icons.Outlined.Favorite, contentDescription = "Ícone de favorito")
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -195,7 +175,7 @@ private fun BuildCard(
             }
             Spacer(modifier = Modifier.height(4.dp))
             AppButton("Visualizar", onClick = {
-                println("View button clicked for $routeName!")
+                println("Botão de visualizar clicado para $routeName!")
             })
         }
     }

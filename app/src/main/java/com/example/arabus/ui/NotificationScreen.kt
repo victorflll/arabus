@@ -1,35 +1,26 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.*
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.R
 import com.example.arabus.components.AppScaffold
@@ -59,11 +50,10 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .verticalScroll(rememberScrollState())
+                    .semantics { contentDescription = "Tela de notificações" }
             ) {
                 Spacer(modifier = Modifier.height(36.dp))
-
                 NotificationHeader()
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 if (notifications.isEmpty()) {
@@ -88,7 +78,8 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
 @Composable
 fun NotificationHeader() {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.semantics { contentDescription = "Cabeçalho de notificações" }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_notification),
@@ -99,9 +90,7 @@ fun NotificationHeader() {
                 .height(32.dp),
             tint = TypographyColor
         )
-
         Spacer(modifier = Modifier.width(12.dp))
-
         Text(
             text = "Notificações",
             style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
@@ -111,7 +100,7 @@ fun NotificationHeader() {
 
 @Composable
 fun NotificationSection(title: String, notifications: List<Pair<String, String>>) {
-    Column {
+    Column(modifier = Modifier.semantics { contentDescription = "Seção de notificações: $title" }) {
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium.copy(
@@ -141,16 +130,13 @@ fun NotificationCard(message: String, time: String) {
     Card(
         modifier = Modifier
             .padding(horizontal = 14.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .semantics { contentDescription = "Notificação recebida: $message às $time" },
         shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = AppGreenOpacity
-        )
+        colors = CardDefaults.cardColors(containerColor = AppGreenOpacity)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -159,9 +145,7 @@ fun NotificationCard(message: String, time: String) {
                 modifier = Modifier.size(32.dp),
                 tint = TypographyColor
             )
-
             Spacer(modifier = Modifier.width(12.dp))
-
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge.copy(
@@ -172,7 +156,6 @@ fun NotificationCard(message: String, time: String) {
                 maxLines = Int.MAX_VALUE,
                 overflow = TextOverflow.Visible
             )
-
             Text(
                 text = time,
                 style = MaterialTheme.typography.bodySmall.copy(
@@ -187,7 +170,7 @@ fun NotificationCard(message: String, time: String) {
 @Composable
 fun EmptyNotificationsMessage() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().semantics { contentDescription = "Nenhuma notificação disponível" },
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -196,13 +179,3 @@ fun EmptyNotificationsMessage() {
         )
     }
 }
-
-@Preview
-@Composable
-private fun Preview() {
-    NotificationCard(
-        message = "Title",
-        time = Date().toFormattedTime(),
-    )
-}
-
