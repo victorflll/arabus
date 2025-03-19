@@ -109,9 +109,9 @@ fun ViewLoginScreen(navController: NavHostController) {
                                         if (token != null) {
                                             coroutineScope.launch(Dispatchers.Main) {
                                                 userViewModel.getUser {
-                                                    UserManager.id = it?.id
-                                                    UserManager.name = it?.profile?.name
-                                                    UserManager.email = it?.email
+                                                    if (it != null) {
+                                                        UserManager.setup(it)
+                                                    }
                                                 }
                                                 navController.navigate("home")
                                                 Toast.makeText(

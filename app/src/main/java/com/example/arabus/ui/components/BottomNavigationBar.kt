@@ -36,9 +36,9 @@ fun BottomNavigationBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick = {navController.navigate("history")},
-            icon = { androidx.compose.material3.Icon(Icons.Default.History, contentDescription = "Histórico") },
-            label = { androidx.compose.material3.Text("Histórico") }
+            onClick = {navController.navigate("profile")},
+            icon = { androidx.compose.material3.Icon(Icons.Default.Person, contentDescription = "Perfil") },
+            label = { androidx.compose.material3.Text("Perfil") }
         )
     }
 }

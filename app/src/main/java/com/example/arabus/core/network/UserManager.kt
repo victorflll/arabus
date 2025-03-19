@@ -1,5 +1,6 @@
 package com.example.arabus.core.network
 
+import com.example.arabus.core.domain.user.User
 import java.util.UUID
 
 object UserManager {
@@ -7,6 +8,15 @@ object UserManager {
     var name: String? = null
     var email: String? = null
     var token: String? = null
+    var user: User? = null
+
+    fun setup(user: User) {
+        id = user.id
+        name = user.profile.name
+        email = user.email
+        token = user.token
+        this.user = user
+    }
 
     fun hasId(): Boolean {
         return id != null
@@ -40,9 +50,18 @@ object UserManager {
         token = null
     }
 
+    fun hasUser(): Boolean {
+        return user != null
+    }
+
+    fun clearUser() {
+        user = null
+    }
+
     fun clear() {
         name = null
         token = null
         token = null
+        user = null
     }
 }
