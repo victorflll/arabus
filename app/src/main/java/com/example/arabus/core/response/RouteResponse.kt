@@ -18,6 +18,8 @@ data class RouteResponse(
     val finishedAt: String,
     val available: Boolean,
     val cost: Double,
+    @SerializedName("picture_uri")
+    val pictureUri: String,
     val rating: Double?
 ) {
     fun toEntity(): Route {
@@ -42,7 +44,7 @@ data class RouteResponse(
             startedAt = LocalDateTime.parse(this.startedAt),
             finishedAt = LocalDateTime.parse(this.finishedAt),
             code = this.code,
-            pictureUri = "arabus-logo",
+            pictureUri = this.pictureUri ?: "",
             rating = this.rating ?: 0.0
         )
     }

@@ -11,6 +11,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import com.example.arabus.FavoritesScreenPath
+import com.example.arabus.NotificationScreenPath
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -29,7 +30,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-            onClick = {navController.navigate("notifications")},
+            onClick = {navController.navigate(NotificationScreenPath)},
             icon = { androidx.compose.material3.Icon(Icons.Default.Notifications, contentDescription = "Notificações") },
             label = { androidx.compose.material3.Text("Notificações") }
         )

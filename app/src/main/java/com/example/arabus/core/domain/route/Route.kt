@@ -11,9 +11,9 @@ data class Route(
     val destination: Location,
     val startedAt: LocalDateTime,
     val finishedAt: LocalDateTime,
-    val code: String,
     val pictureUri: String,
-    val rating: Double
+    val rating: Double,
+    val code: String?,
 )
 
 data class Location(

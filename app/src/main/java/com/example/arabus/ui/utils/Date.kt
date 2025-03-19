@@ -8,6 +8,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 
+
 fun Date.toFormattedTime(): String {
     val format = SimpleDateFormat("HH:mm", Locale.getDefault())
     return format.format(this)
