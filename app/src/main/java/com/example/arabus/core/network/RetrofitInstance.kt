@@ -1,9 +1,8 @@
 package com.example.arabus.core.network
 
 import com.example.arabus.core.interfaces.IAuthApi
-import com.example.arabus.core.interfaces.IHistoryAPI
-import com.example.arabus.core.interfaces.IRouteAPI
 import com.example.arabus.core.interfaces.IUserApi
+import com.example.arabus.core.interfaces.INotificationAPI
 
 object RetrofitInstance {
     val user: IUserApi by lazy {
@@ -20,5 +19,9 @@ object RetrofitInstance {
 
     val history: IHistoryAPI by lazy {
         RetrofitBuilder.createService(IHistoryAPI::class.java)
+    }
+
+    val notification: INotificationAPI by lazy {
+        RetrofitBuilder.createService(INotificationAPI::class.java)
     }
 }
