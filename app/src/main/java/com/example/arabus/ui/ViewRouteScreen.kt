@@ -35,6 +35,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -69,9 +71,19 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                     navigationIconContentColor = AppWhite,
                     titleContentColor = AppWhite,
                 ),
-                title = { Text("Rotas disponíveis") },
+                title = {
+                    Text(
+                        "Rotas disponíveis",
+                        modifier = Modifier.semantics {
+                            contentDescription = "Tela de rotas disponíveis"
+                        }
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier.semantics { contentDescription = "Botão voltar" }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Voltar"
@@ -92,7 +104,11 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.semantics {
+                            contentDescription = "Carregando rotas disponíveis..."
+                        }
+                    )
                 }
             } else if (routes.isEmpty()) {
                 Box(
@@ -100,23 +116,27 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("Nenhuma rota disponível.")
+                    Text(
+                        "Nenhuma rota disponível.",
+                        modifier = Modifier.semantics {
+                            contentDescription = "Nenhuma rota disponível no momento"
+                        }
+                    )
                 }
             } else {
                 LazyColumn(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
                     items(routes.size) { i ->
-                        val route = routes[i].route
-                        val address = routes[i]
+                        val route = routes[i]
                         BuildCard(
-                            routeName = "Rota ${route.routeCode}",
+                            routeName = "Rota ${route.code}",
                             startTime = route.startedAt.toFormattedTime(),
                             endTime = route.finishedAt.toFormattedTime(),
-                            startLocation = address.startStreet,
-                            endLocation = address.endStreet,
+                            startLocation = route.origin.street,
+                            endLocation = route.destination.street,
                             duration = route.finishedAt.timeDifference(route.startedAt),
-                            fareInfo = route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                            rating = "4.5",
-                            logo = route.pictureUri ?: "arabus-logo",
+                            fareInfo = route.cost.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                            rating = route.rating.toString(),
+                            logo = "arabus-logo",
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -125,7 +145,6 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
         }
     }
 }
-
 
 @Composable
 private fun BuildCard(
@@ -144,7 +163,11 @@ private fun BuildCard(
             containerColor = AppGreenOpacity,
             contentColor = AppBlack,
         ),
-        border = BorderStroke(1.dp, AppBlack)
+        border = BorderStroke(1.dp, AppBlack),
+        modifier = Modifier.semantics {
+            contentDescription =
+                "Rota disponível: $routeName, saída às $startTime, chegada às $endTime, duração estimada de $duration, tarifa $fareInfo, classificação $rating estrelas."
+        }
     ) {
         Column(
             modifier = Modifier
@@ -155,7 +178,12 @@ private fun BuildCard(
                 LoadAsset.PngExtension(logo)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
-                    Text(text = routeName)
+                    Text(
+                        text = routeName,
+                        modifier = Modifier.semantics {
+                            contentDescription = "Nome da rota: $routeName"
+                        }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
                     Row {
                         Icon(
@@ -168,7 +196,13 @@ private fun BuildCard(
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(Icons.Outlined.Favorite, contentDescription = null)
+                Icon(
+                    Icons.Outlined.Favorite,
+                    contentDescription = "Ícone de favorito",
+                    modifier = Modifier.semantics {
+                        contentDescription = "Ícone para favoritar a rota"
+                    }
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -176,9 +210,15 @@ private fun BuildCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column {
-                    Text(text = startTime)
+                    Text(
+                        text = startTime,
+                        modifier = Modifier.semantics { contentDescription = "Horário de saída: $startTime" }
+                    )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = endTime)
+                    Text(
+                        text = endTime,
+                        modifier = Modifier.semantics { contentDescription = "Horário de chegada: $endTime" }
+                    )
                 }
                 AppOriginToDestination(
                     height = 12.dp,
@@ -186,17 +226,36 @@ private fun BuildCard(
                     modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 Column {
-                    Text(text = startLocation)
-                    Text(text = duration, fontSize = TextUnit(8f, TextUnitType.Sp))
-                    Text(text = endLocation)
+                    Text(
+                        text = startLocation,
+                        modifier = Modifier.semantics { contentDescription = "Origem: $startLocation" }
+                    )
+                    Text(
+                        text = duration,
+                        fontSize = TextUnit(8f, TextUnitType.Sp),
+                        modifier = Modifier.semantics { contentDescription = "Duração: $duration" }
+                    )
+                    Text(
+                        text = endLocation,
+                        modifier = Modifier.semantics { contentDescription = "Destino: $endLocation" }
+                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                Text(text = fareInfo)
+                Text(
+                    text = fareInfo,
+                    modifier = Modifier.semantics { contentDescription = "Tarifa: $fareInfo" }
+                )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            AppButton("Visualizar", onClick = {
-                println("View button clicked for $routeName!")
-            })
+            AppButton(
+                "Visualizar",
+                onClick = {
+                    println("View button clicked for $routeName!")
+                },
+                modifier = Modifier.semantics {
+                    contentDescription = "Botão para visualizar detalhes da rota $routeName"
+                }
+            )
         }
     }
 }

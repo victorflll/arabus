@@ -1,7 +1,6 @@
 package com.example.arabus.ui
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,9 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
-import com.example.arabus.repository.internal.entities.History
+import com.example.arabus.core.domain.history.History
+import com.example.arabus.core.network.UserManager
+import com.example.arabus.core.request.HistoryRequest
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
 import com.example.arabus.ui.theme.AppGreen
@@ -58,15 +59,19 @@ import com.example.arabus.ui.view.RouteViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewModel, historyViewModel: HistoryViewModel) {
-    val userMockId = 1
-    val routes by routeViewModel.routes.collectAsState()
+fun HistoryScreen(
+    navController: NavHostController,
+    routeViewModel: RouteViewModel,
+    historyViewModel: HistoryViewModel
+) {
+    val userId = UserManager.id
     val isLoading by routeViewModel.isLoading.collectAsState()
 
     var history by rememberSaveable { mutableStateOf<List<History>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        historyViewModel.getHistoryByUserId(userMockId) { historyList ->
+        if (userId == null) return@LaunchedEffect
+        historyViewModel.getHistoryByUserId(HistoryRequest(userId = userId)) { historyList ->
             history = historyList
         }
         routeViewModel.loadRoutes()
@@ -113,21 +118,21 @@ fun HistoryScreen(navController: NavHostController, routeViewModel: RouteViewMod
                 LazyColumn {
                     items(history.size) { index ->
                         val historyItem = history[index]
-                        val routeItem = routes.find { it.route.id == historyItem.routeId }
+                        val routeItem = historyItem.route
 
-                        if (routeItem != null) {
-                            BuildCard(
-                                routeName = "Rota ${routeItem.route.routeCode}",
-                                startTime = routeItem.route.startedAt.toFormattedTime(),
-                                endTime = routeItem.route.finishedAt.toFormattedTime(),
-                                startLocation = routeItem.startStreet,
-                                endLocation = routeItem.endStreet,
-                                duration = routeItem.route.finishedAt.timeDifference(routeItem.route.startedAt),
-                                fareInfo = routeItem.route.cost?.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                rating = "4.$index",
-                                logo = routeItem.route.pictureUri ?: "arabus-logo",
-                            )
-                        }
+                        BuildCard(
+                            routeName = "Rota ${routeItem.code}",
+                            startTime = routeItem.startedAt.toFormattedTime(),
+                            endTime = routeItem.finishedAt.toFormattedTime(),
+                            startLocation = routeItem.origin.street,
+                            endLocation = routeItem.destination.street,
+                            duration = routeItem.finishedAt.timeDifference(routeItem.startedAt),
+                            fareInfo = routeItem.cost.takeIf { it > 0 }
+                                ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+                            rating = routeItem.rating.toString(),
+                            logo = routeItem.pictureUri.ifEmpty { "arabus-logo" }
+                        )
+
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
@@ -182,7 +187,11 @@ private fun BuildCard(
                 )
                 Column {
                     Text(text = startLocation)
-                    Text(text = duration, fontSize = TextUnit(8f, TextUnitType.Sp), modifier = Modifier.padding(vertical = 6.dp))
+                    Text(
+                        text = duration,
+                        fontSize = TextUnit(8f, TextUnitType.Sp),
+                        modifier = Modifier.padding(vertical = 6.dp)
+                    )
                     Text(text = endLocation)
                 }
                 Spacer(modifier = Modifier.weight(1f))

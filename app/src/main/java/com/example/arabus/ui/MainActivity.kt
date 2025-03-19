@@ -2,9 +2,10 @@ package com.example.arabus.ui
 
 import android.app.Application
 import android.os.Bundle
+import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,6 +41,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun App() {
     val navController = rememberNavController()
+    val context = LocalContext.current
+
+    val accessibilityManager = remember {
+        context.getSystemService(AccessibilityManager::class.java)
+    }
+    var isTalkBackEnabled by remember { mutableStateOf(accessibilityManager?.isTouchExplorationEnabled ?: false) }
+
+    DisposableEffect(accessibilityManager) {
+        val listener = AccessibilityManager.AccessibilityStateChangeListener {
+            isTalkBackEnabled = accessibilityManager?.isTouchExplorationEnabled ?: false
+        }
+        accessibilityManager?.addAccessibilityStateChangeListener(listener)
+        onDispose {
+            accessibilityManager?.removeAccessibilityStateChangeListener(listener)
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = SplashScreenPath
@@ -86,7 +104,11 @@ private fun App() {
                     owner,
                     factory = FavoriteViewModelFactory(application, routeViewModel)
                 )
-                FavoritesScreen(navController = navController, viewModel = favoriteViewModel)
+                FavoritesScreen(
+                    navController = navController,
+                    viewModel = favoriteViewModel,
+
+                )
             }
         }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }

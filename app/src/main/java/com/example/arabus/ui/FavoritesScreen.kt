@@ -27,6 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.TextUnit
@@ -34,6 +37,9 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.domain.favorite.FavoriteDomain
+import com.example.arabus.core.network.UserManager
+import com.example.arabus.core.request.FavoriteRequest
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
 import com.example.arabus.ui.theme.AppGreenOpacity
@@ -45,11 +51,16 @@ import com.example.arabus.ui.view.FavoriteViewModel
 
 @Composable
 fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
-    val favorites by viewModel.favorites.collectAsState()
+    val userId = UserManager.id
     val isLoading by viewModel.isLoading.collectAsState()
+    var favorites by rememberSaveable { mutableStateOf(emptyList<FavoriteDomain>()) }
 
     LaunchedEffect(Unit) {
-        viewModel.loadFavorites()
+        if (userId != null) {
+            viewModel.getFavoritesByUserId(FavoriteRequest(userId)) { favoriteList ->
+                favorites = favoriteList
+            }
+        }
     }
 
     AppScaffold(navController = navController) { innerPadding ->
@@ -73,8 +84,7 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                     }
                 } else if (favorites.isEmpty()) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("Nenhuma rota favoritada.")
@@ -91,16 +101,16 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                             val route = favorites[i].route
                             FavoriteRouteCard(
                                 FavoriteRoute(
-                                    startTime = route.route.startedAt.toFormattedTime(),
-                                    endTime = route.route.finishedAt.toFormattedTime(),
-                                    startLocation = route.startStreet,
-                                    endLocation = route.endStreet,
-                                    duration = route.route.finishedAt.timeDifference(route.route.startedAt),
-                                    price = route.route.cost?.takeIf { it > 0 }
+                                    startTime = route.startedAt.toFormattedTime(),
+                                    endTime = route.finishedAt.toFormattedTime(),
+                                    startLocation = route.origin.street,
+                                    endLocation = route.destination.street,
+                                    duration = route.finishedAt.timeDifference(route.startedAt),
+                                    price = route.cost?.takeIf { it > 0 }
                                         ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                    logo = route.route.pictureUri ?: "arabus-logo",
-                                    line = "Rota ${route.route.routeCode}",
-                                    rating = "Rota ${route.route.routeCode}",
+                                    logo = route.pictureUri.ifEmpty { "arabus-logo" },
+                                    line = "Rota ${route.code}",
+                                    rating = route.rating.toString(),
                                 )
                             )
                         }
