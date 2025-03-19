@@ -3,40 +3,16 @@ package com.example.arabus.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Accessibility
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Feedback
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Policy
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.core.domain.user.User
+import com.example.arabus.core.network.UserManager
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
@@ -57,16 +34,7 @@ import com.example.arabus.ui.view.UserViewModel
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
-    val userViewModel: UserViewModel = viewModel()
-    var user by rememberSaveable { mutableStateOf<User?>(null) }
-
-    LaunchedEffect(Unit) {
-        userViewModel.getUser { userFetched ->
-            if (userFetched != null) {
-                user = userFetched
-            }
-        }
-    }
+    var user = UserManager.profile
 
     ArabusTheme {
         AppScaffold(navController = navController) {
@@ -76,19 +44,10 @@ fun ProfileScreen(navController: NavHostController) {
                     .verticalScroll(rememberScrollState())
             ) {
                 Spacer(modifier = Modifier.height(36.dp))
-
                 ProfileHeader()
-
                 Spacer(modifier = Modifier.height(20.dp))
-
-                HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    thickness = 1.dp,
-                    color = AppLightGrey
-                )
-
+                HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = AppLightGrey)
                 Spacer(modifier = Modifier.height(20.dp))
-
                 ProfileButtonsSection(navController, user)
             }
         }
@@ -105,8 +64,7 @@ fun ProfileHeader() {
             contentDescription = "Ícone de perfil",
             modifier = Modifier
                 .padding(start = 26.dp)
-                .width(24.dp)
-                .height(32.dp),
+                .size(32.dp), // 🔹 Melhorando tamanho do ícone
             tint = TypographyColor
         )
 
@@ -135,17 +93,13 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?) {
                     .background(AppLightGrey),
                 contentAlignment = Alignment.Center
             ) {
-                LoadAsset.PngExtension(
-                    "real-logo",
-                    width = 64.dp,
-                    height = 64.dp
-                )
+                LoadAsset.PngExtension("real-logo", width = 64.dp, height = 64.dp)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start // 🔹 Melhorando alinhamento
             ) {
                 Text(
                     text = user?.profile?.name ?: "Nome não disponível",
@@ -161,11 +115,7 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?) {
 
     Spacer(modifier = Modifier.height(18.dp))
 
-    HorizontalDivider(
-        modifier = Modifier.fillMaxWidth(),
-        thickness = 1.dp,
-        color = AppLightGrey
-    )
+    HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = AppLightGrey)
 
     Spacer(modifier = Modifier.height(18.dp))
 
@@ -199,7 +149,6 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?) {
         }
     }
 }
-
 
 @Composable
 fun ProfileButton(label: String, icon: ImageVector, hasDownloadIcon: Boolean, isLogout: Boolean = false, onClick: () -> Unit) {

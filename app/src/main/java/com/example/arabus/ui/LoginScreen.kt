@@ -112,6 +112,7 @@ fun ViewLoginScreen(navController: NavHostController) {
                                                     UserManager.id = it?.id
                                                     UserManager.name = it?.profile?.name
                                                     UserManager.email = it?.email
+                                                    UserManager.profile = it
                                                 }
                                                 navController.navigate("home")
                                                 Toast.makeText(
