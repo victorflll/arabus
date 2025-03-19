@@ -34,7 +34,7 @@ import com.example.arabus.ui.view.UserViewModel
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
-    var user = UserManager.profile
+    val user = UserManager.user
 
     ArabusTheme {
         AppScaffold(navController = navController) {

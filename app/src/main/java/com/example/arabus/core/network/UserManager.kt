@@ -8,7 +8,15 @@ object UserManager {
     var name: String? = null
     var email: String? = null
     var token: String? = null
-    var profile: User? = null
+    var user: User? = null
+
+    fun setup(user: User) {
+        id = user.id
+        name = user.profile.name
+        email = user.email
+        token = user.token
+        this.user = user
+    }
 
     fun hasId(): Boolean {
         return id != null
@@ -42,18 +50,18 @@ object UserManager {
         token = null
     }
 
-    fun hasProfile(): Boolean {
-        return profile != null
+    fun hasUser(): Boolean {
+        return user != null
     }
 
-    fun clearProfile() {
-        profile = null
+    fun clearUser() {
+        user = null
     }
 
     fun clear() {
         name = null
         token = null
         token = null
-        profile = null
+        user = null
     }
 }
