@@ -1,31 +1,19 @@
 package com.example.arabus.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,18 +26,27 @@ import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
+import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.NotificationViewModel
 import java.util.Date
 
 @Composable
 fun NotificationScreen(navController: NavHostController, viewModel: NotificationViewModel) {
+    val context = LocalContext.current
+    val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
+    val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
+
     val notifications = remember { mutableStateListOf<Notification>() }
 
     LaunchedEffect(Unit) {
         viewModel.getNotificationsByUserId(1) { fetchedNotifications ->
             notifications.clear()
             notifications.addAll(fetchedNotifications)
+
+            if (isTalkBackEnabled && fetchedNotifications.isNotEmpty()) {
+                Toast.makeText(context, "Você tem ${fetchedNotifications.size} novas notificações", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -76,7 +73,7 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
                         }
 
                     groupedNotifications.forEach { (title, messages) ->
-                        NotificationSection(title = title, notifications = messages)
+                        NotificationSection(title = title, notifications = messages, isTalkBackEnabled)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
@@ -88,7 +85,10 @@ fun NotificationScreen(navController: NavHostController, viewModel: Notification
 @Composable
 fun NotificationHeader() {
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.semantics {
+            contentDescription = "Cabeçalho de notificações"
+        }
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_notification),
@@ -104,13 +104,16 @@ fun NotificationHeader() {
 
         Text(
             text = "Notificações",
-            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
+            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor),
+            modifier = Modifier.semantics {
+                contentDescription = "Lista de notificações recebidas"
+            }
         )
     }
 }
 
 @Composable
-fun NotificationSection(title: String, notifications: List<Pair<String, String>>) {
+fun NotificationSection(title: String, notifications: List<Pair<String, String>>, isTalkBackEnabled: Boolean) {
     Column {
         Text(
             text = title,
@@ -118,7 +121,9 @@ fun NotificationSection(title: String, notifications: List<Pair<String, String>>
                 color = TypographyColor,
                 fontWeight = FontWeight.Bold
             ),
-            modifier = Modifier.padding(start = 14.dp, bottom = 6.dp)
+            modifier = Modifier
+                .padding(start = 14.dp, bottom = 6.dp)
+                .semantics { contentDescription = "Seção de notificações para $title" }
         )
 
         HorizontalDivider(
@@ -130,18 +135,23 @@ fun NotificationSection(title: String, notifications: List<Pair<String, String>>
         Spacer(modifier = Modifier.height(18.dp))
 
         notifications.forEach { (message, time) ->
-            NotificationCard(message = message, time = time)
+            NotificationCard(message = message, time = time, isTalkBackEnabled)
             Spacer(modifier = Modifier.height(14.dp))
         }
     }
 }
 
 @Composable
-fun NotificationCard(message: String, time: String) {
+fun NotificationCard(message: String, time: String, isTalkBackEnabled: Boolean) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .padding(horizontal = 14.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .semantics {
+                contentDescription = "Notificação: $message, recebida às $time"
+            },
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = AppGreenOpacity
@@ -162,32 +172,40 @@ fun NotificationCard(message: String, time: String) {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    color = TypographyColor,
-                    fontWeight = FontWeight.Bold
-                ),
-                modifier = Modifier.weight(1f),
-                maxLines = Int.MAX_VALUE,
-                overflow = TextOverflow.Visible
-            )
-
-            Text(
-                text = time,
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = TypographyColor,
-                    fontWeight = FontWeight.Bold
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = TypographyColor,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    modifier = Modifier.weight(1f),
+                    maxLines = Int.MAX_VALUE,
+                    overflow = TextOverflow.Visible
                 )
-            )
+
+                Text(
+                    text = time,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = TypographyColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
         }
+    }
+
+    if (isTalkBackEnabled) {
+        Toast.makeText(context, "Notificação: $message, recebida às $time", Toast.LENGTH_SHORT).show()
     }
 }
 
 @Composable
 fun EmptyNotificationsMessage() {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .semantics { contentDescription = "Nenhuma notificação disponível" },
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -195,14 +213,5 @@ fun EmptyNotificationsMessage() {
             style = MaterialTheme.typography.bodyLarge.copy(color = TypographyColor)
         )
     }
-}
-
-@Preview
-@Composable
-private fun Preview() {
-    NotificationCard(
-        message = "Title",
-        time = Date().toFormattedTime(),
-    )
 }
 

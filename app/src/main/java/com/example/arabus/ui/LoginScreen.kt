@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -36,6 +40,7 @@ import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.utils.LoadAsset
+import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.view.UserViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,6 +54,10 @@ private val HorizontalPadding = 16.dp
 
 @Composable
 fun ViewLoginScreen(navController: NavHostController) {
+    val context = LocalContext.current
+    val sharedPrefManager = remember { SharedPreferenceManager(context) }
+    val isTalkBackEnabled = sharedPrefManager.isTalkBackEnabled()
+
     val userViewModel: UserViewModel = viewModel()
 
     val username = remember { mutableStateOf("joao@example.com") }
@@ -91,26 +100,44 @@ fun ViewLoginScreen(navController: NavHostController) {
                             loginError.value = null
                             coroutineScope.launch {
                                 try {
-                                    userViewModel.login(LoginRequest(username.value, password.value)) { token ->
+                                    userViewModel.login(
+                                        LoginRequest(
+                                            username.value,
+                                            password.value
+                                        )
+                                    ) { token ->
                                         if (token != null) {
                                             coroutineScope.launch(Dispatchers.Main) {
-                                                navController.navigate("home")
                                                 userViewModel.getUser {
                                                     UserManager.name = it?.profile?.name
                                                     UserManager.email = it?.email
                                                 }
+                                                navController.navigate("home")
+                                                Toast.makeText(
+                                                    context,
+                                                    "Login bem-sucedido",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         } else {
                                             coroutineScope.launch(Dispatchers.Main) {
                                                 isLoading.value = false
-                                                loginError.value = "Credenciais inválidas. Tente novamente."
+                                                Toast.makeText(
+                                                    context,
+                                                    "Credenciais inválidas",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                             }
                                         }
                                     }
                                 } catch (e: Exception) {
                                     withContext(Dispatchers.Main) {
                                         isLoading.value = false
-                                        loginError.value = "Erro inesperado."
+                                        Toast.makeText(
+                                            context,
+                                            "Erro inesperado.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
@@ -142,9 +169,15 @@ fun LoginForm(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
+        Box(
+            modifier = Modifier.semantics {
+                contentDescription = "Logotipo do AraBus"
+            }
+        ) {
+            LoadAsset.PngExtension("arabus-logo", width = 200.dp, height = 85.dp)
+        }
 
-        Spacer(modifier = Modifier.height(SpacingBetweenSections + 32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         Text(
             text = buildAnnotatedString {
@@ -161,6 +194,7 @@ fun LoginForm(
                 .fillMaxWidth(0.7f)
                 .align(Alignment.Start)
                 .padding(start = 14.dp, bottom = HorizontalPadding)
+                .semantics { contentDescription = "Mensagem de boas-vindas ao AraBus" }
         )
 
         Spacer(modifier = Modifier.height(SpacingBetweenSections))
@@ -174,6 +208,7 @@ fun LoginForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 12.dp)
+                .semantics { contentDescription = "Campo para inserir o e-mail" }
         )
 
         AppTextField(
@@ -194,12 +229,17 @@ fun LoginForm(
                 modifier = Modifier
                     .align(Alignment.Start)
                     .padding(top = 8.dp, start = 10.dp)
+                    .semantics { contentDescription = "Erro: $loginError" }
             )
         }
 
         TextButton(
             onClick = onForgotPasswordClick,
-            modifier = Modifier.align(Alignment.End)
+            modifier = Modifier
+                .align(Alignment.End)
+                .semantics {
+                    contentDescription = "Botão para recuperar senha"
+                }
         ) {
             Text(
                 text = "Esqueceu a senha?",
@@ -212,14 +252,18 @@ fun LoginForm(
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.semantics { contentDescription = "Carregando login..." }
+                )
             }
         } else {
             AppButton(
                 title = "Login",
                 onClick = onLoginClick,
                 fontSize = TitleStyle.fontSize,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { contentDescription = "Botão de login" },
                 padding = PaddingValues(all = 0.dp)
             )
         }
@@ -243,7 +287,10 @@ fun SignupFooter(
             fontSize = SubtitleFontSize,
             color = Color.White
         )
-        TextButton(onClick = onSignupClick) {
+        TextButton(
+            onClick = onSignupClick,
+            modifier = Modifier.semantics { contentDescription = "Botão para cadastro" }
+        ) {
             Text(
                 text = "Cadastre-se",
                 fontSize = SubtitleFontSize,
