@@ -25,7 +25,8 @@ class HistoryRepository : IHistoryRepository {
     }
 
     override suspend fun getHistoryById(historyRequest: HistoryRequest): List<History> {
-        TODO("Not yet implemented")
+        val response = api.getHistoryByUserId(historyRequest.userId.toString())
+        return response.body()?.map { it.toEntity() } ?: emptyList()
     }
 
 

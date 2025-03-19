@@ -8,7 +8,7 @@ import java.util.UUID
 
 
 data class RouteResponse(
-    val routeCode: String,
+    val code: String,
     val origin: Location,
     val destination: Location,
     @SerializedName("started_at")
@@ -42,7 +42,7 @@ data class RouteResponse(
             destination = destinationLocation,
             startedAt = LocalDateTime.parse(this.startedAt),
             finishedAt = LocalDateTime.parse(this.finishedAt),
-            code = this.routeCode,
+            code = this.code,
             pictureUri = this.pictureUri ?: "",
             rating = this.rating ?: 0.0
         )
