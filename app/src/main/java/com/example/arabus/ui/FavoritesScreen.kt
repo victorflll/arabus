@@ -1,21 +1,34 @@
 package com.example.arabus.ui
 
-import android.content.Context
-import android.view.accessibility.AccessibilityManager
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -31,12 +44,7 @@ import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.FavoriteViewModel
 
 @Composable
-fun FavoritesScreen(
-    navController: NavHostController,
-    viewModel: FavoriteViewModel,
-    isTalkBackEnabled: Boolean
-) {
-    val context = LocalContext.current
+fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewModel) {
     val favorites by viewModel.favorites.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
@@ -61,11 +69,7 @@ fun FavoritesScreen(
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.semantics {
-                                contentDescription = "Carregando favoritos..."
-                            }
-                        )
+                        CircularProgressIndicator()
                     }
                 } else if (favorites.isEmpty()) {
                     Box(
@@ -73,12 +77,7 @@ fun FavoritesScreen(
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            "Nenhuma rota favoritada.",
-                            modifier = Modifier.semantics {
-                                contentDescription = "Nenhuma rota favoritada disponível."
-                            }
-                        )
+                        Text("Nenhuma rota favoritada.")
                     }
                 } else {
                     LazyColumn(
@@ -90,22 +89,20 @@ fun FavoritesScreen(
                     ) {
                         items(favorites.size) { i ->
                             val route = favorites[i].route
-                            FavoriteRouteCard(
-                                route = FavoriteRoute(
-                                    startTime = route.route.startedAt.toFormattedTime(),
-                                    endTime = route.route.finishedAt.toFormattedTime(),
-                                    startLocation = route.startStreet,
-                                    endLocation = route.endStreet,
-                                    duration = route.route.finishedAt.timeDifference(route.route.startedAt),
-                                    price = route.route.cost?.takeIf { it > 0 }
-                                        ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
-                                    logo = route.route.pictureUri ?: "arabus-logo",
-                                    line = "Rota ${route.route.routeCode}",
-                                    rating = "Nota: 4.5"
-                                ),
-                                isTalkBackEnabled = isTalkBackEnabled,
-                                context = context
-                            )
+//                            FavoriteRouteCard(
+//                                FavoriteRoute(
+//                                    startTime = route.startedAt.toFormattedTime(),
+//                                    endTime = route.finishedAt.toFormattedTime(),
+//                                    startLocation = route.origin.street,
+//                                    endLocation = route.destination.street,
+//                                    duration = route.finishedAt.timeDifference(route.startedAt),
+//                                    price = route.cost?.takeIf { it > 0 }
+//                                        ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
+//                                    logo = route.pictureUri ?: "arabus-logo",
+//                                    line = "Rota ${route.code}",
+//                                    rating = "Rota ${route.code}",
+//                                )
+//                            )
                         }
                     }
                 }
@@ -114,12 +111,10 @@ fun FavoritesScreen(
     }
 }
 
+
 @Composable
 fun FavoritesHeader() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.semantics { contentDescription = "Tela de Favoritos" }
-    ) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = Icons.Outlined.FavoriteBorder,
             contentDescription = "Ícone de favoritos",
@@ -131,23 +126,18 @@ fun FavoritesHeader() {
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "Favoritos",
-            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor),
-            modifier = Modifier.semantics { contentDescription = "Lista de rotas favoritas" }
+            style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
         )
     }
 }
 
 @Composable
-fun FavoriteRouteCard(route: FavoriteRoute, isTalkBackEnabled: Boolean, context: Context) {
+fun FavoriteRouteCard(route: FavoriteRoute) {
     Card(
         colors = CardDefaults.cardColors(containerColor = AppGreenOpacity),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .semantics {
-                contentDescription =
-                    "Rota de ${route.startLocation} para ${route.endLocation}, saída às ${route.startTime}, chegada às ${route.endTime}. Tempo estimado: ${route.duration}. Preço: ${route.price}."
-            },
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         border = BorderStroke(1.dp, AppBlack)
     ) {
         Column(modifier = Modifier.padding(16.dp, 12.dp, 16.dp, 8.dp)) {
@@ -195,7 +185,7 @@ fun FavoriteRouteCard(route: FavoriteRoute, isTalkBackEnabled: Boolean, context:
                     Row {
                         Icon(
                             imageVector = Icons.Outlined.Star,
-                            contentDescription = "Classificação da rota",
+                            contentDescription = null,
                             modifier = Modifier.size(16.dp),
                             tint = AppBlack
                         )

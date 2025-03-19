@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class FavoriteViewModel(application: Application, private val routeViewModel: RouteViewModel) :
     AndroidViewModel(application) {
@@ -26,17 +27,17 @@ class FavoriteViewModel(application: Application, private val routeViewModel: Ro
             _isLoading.value = true
             val favorites = favoriteDao.getAll()
 
-            val routes = routeViewModel.loadRoutes()
-
-            val dtos = favorites.mapNotNull { favorite ->
-                val route = routeViewModel.routes.value.find { it.route.id == favorite.routeId }
-                if (route != null) {
-                    FavoriteDto(route, favorite)
-                } else {
-                    null
-                }
-            }
-            _favorites.value = dtos
+//            val routes = routeViewModel.loadRoutes()
+//
+//            val dtos = favorites.mapNotNull { favorite ->
+//                val route = routeViewModel.routes.value.find { it.id == "lji2u" as UUID }
+//                if (route != null) {
+//                    FavoriteDto(route, favorite)
+//                } else {
+//                    null
+//                }
+//            }
+//            _favorites.value = dtos
             _isLoading.value = false
         }
     }
