@@ -10,6 +10,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.NotificationScreenPath
 
 @Composable
@@ -23,7 +24,7 @@ fun BottomNavigationBar(navController: NavHostController) {
         )
         NavigationBarItem(
             selected = false,
-           onClick = {navController.navigate("favorite")},
+           onClick = {navController.navigate(FavoritesScreenPath)},
             icon = { androidx.compose.material3.Icon(Icons.Default.Favorite, contentDescription = "Favoritos") },
             label = { androidx.compose.material3.Text("Favoritos") }
         )

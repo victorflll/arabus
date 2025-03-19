@@ -3,41 +3,29 @@ package com.example.arabus.ui.view
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.arabus.core.dtos.FavoriteDto
-import com.example.arabus.repository.database.DatabaseInstance
+import com.example.arabus.core.domain.favorite.FavoriteDomain
+import com.example.arabus.core.request.FavoriteRequest
+import com.example.arabus.repository.FavoriteRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
-class FavoriteViewModel(application: Application, private val routeViewModel: RouteViewModel) :
-    AndroidViewModel(application) {
-    private val database = DatabaseInstance.getDatabase(application)
-    private val favoriteDao = database.favoriteDao()
+class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
+    private val favoriteRepository = FavoriteRepository()
 
-    private val _favorites = MutableStateFlow<List<FavoriteDto>>(emptyList())
-    val favorites: StateFlow<List<FavoriteDto>> = _favorites
+    private val _favorites = MutableStateFlow<List<FavoriteDomain>>(emptyList())
+    val favorites: StateFlow<List<FavoriteDomain>> = _favorites
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    fun loadFavorites() {
+    fun getFavoritesByUserId(favoriteRequest: FavoriteRequest, onResult: (List<FavoriteDomain>) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
-            val favorites = favoriteDao.getAll()
-
-//            val routes = routeViewModel.loadRoutes()
-//
-//            val dtos = favorites.mapNotNull { favorite ->
-//                val route = routeViewModel.routes.value.find { it.id == "lji2u" as UUID }
-//                if (route != null) {
-//                    FavoriteDto(route, favorite)
-//                } else {
-//                    null
-//                }
-//            }
-//            _favorites.value = dtos
+            val apiFavorites = favoriteRepository.getFavoritesByUserId(favoriteRequest)
+            _favorites.value = apiFavorites
+            onResult(apiFavorites)
             _isLoading.value = false
         }
     }

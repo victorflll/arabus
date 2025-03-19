@@ -12,7 +12,7 @@ class FavoriteViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FavoriteViewModel::class.java)) {
-            return FavoriteViewModel(application, routeViewModel) as T
+            return FavoriteViewModel(application) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

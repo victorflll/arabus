@@ -106,6 +106,7 @@ private fun App() {
                 FavoritesScreen(
                     navController = navController,
                     viewModel = favoriteViewModel,
+
                 )
             }
         }

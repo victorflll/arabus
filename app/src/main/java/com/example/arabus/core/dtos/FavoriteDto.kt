@@ -1,8 +1,8 @@
 package com.example.arabus.core.dtos
 
-import com.example.arabus.repository.internal.entities.Favorite
+import com.example.arabus.core.domain.favorite.FavoriteDomain
 
 data class FavoriteDto(
     val route: RouteDto,
-    val favorite: Favorite
+    val favorite: FavoriteDomain
 )

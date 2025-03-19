@@ -8,6 +8,7 @@ import java.util.UUID
 
 
 data class RouteResponse(
+    val id: String,
     val code: String,
     val origin: Location,
     val destination: Location,
@@ -35,7 +36,7 @@ data class RouteResponse(
         )
 
         return Route(
-            id = UUID.randomUUID(),
+            id = UUID.fromString(this.id),
             available = this.available,
             cost = this.cost,
             origin = originLocation,
