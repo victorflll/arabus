@@ -110,7 +110,7 @@ fun FavoritesScreen(navController: NavHostController, viewModel: FavoriteViewMod
                                         ?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
                                     logo = route.pictureUri.ifEmpty { "arabus-logo" },
                                     line = "Rota ${route.code}",
-                                    rating = "4.$i",
+                                    rating = route.rating.toString(),
                                 )
                             )
                         }
