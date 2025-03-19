@@ -22,7 +22,6 @@ import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.ui.factories.FavoriteViewModelFactory
-import com.example.arabus.ui.screens.HomeScreen
 import com.example.arabus.ui.view.FavoriteViewModel
 import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.NotificationViewModel
