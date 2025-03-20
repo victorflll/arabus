@@ -30,7 +30,7 @@ import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.LoadAsset
-import com.example.arabus.ui.view.UserViewModel
+import com.example.arabus.ui.utils.downloadDocument
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
@@ -140,6 +140,7 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?) {
                 onClick = {
                     when (label) {
                         "Histórico de Corridas" -> navController.navigate("history")
+                        "Termos de Uso" -> downloadDocument(navController.context, "terms_of_use.pdf")
                         "Logout" -> {/* Implementar logout */}
                         else -> {/* Outras ações */}
                     }
