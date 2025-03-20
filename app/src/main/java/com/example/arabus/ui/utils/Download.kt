@@ -15,10 +15,8 @@ fun downloadDocument(context: Context, fileName: String) {
     try {
         Log.d("DownloadDocument", "Tentando abrir o arquivo: $fileName")
 
-        // Acessar o arquivo dentro dos assets
         val inputStream: InputStream = context.assets.open(fileName)
 
-        // Criar o arquivo na pasta de downloads privada do app
         val outputFile = File(
             context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
             fileName
@@ -37,10 +35,8 @@ fun downloadDocument(context: Context, fileName: String) {
 
         Log.d("DownloadDocument", "Arquivo salvo em: ${outputFile.absolutePath}")
 
-        // Criar URI segura com FileProvider
         val uri: Uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", outputFile)
 
-        // Intent para abrir o PDF
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/pdf")
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
