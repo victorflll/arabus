@@ -80,6 +80,7 @@ fun ProfileScreen(navController: NavHostController) {
             onDismiss = { showLogoutDialog = false },
             onConfirm = {
                 showLogoutDialog = false
+                navController.navigate("login_route")
             }
         )
     }
