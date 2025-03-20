@@ -10,8 +10,6 @@ import okhttp3.Request
 import org.json.JSONObject
 
 suspend fun getRoute(start: LatLng, end: LatLng, context: Context): List<LatLng> {
-    Log.d("RouteScreen", "start: $start")
-    Log.d("RouteScreen", "end: $end")
     return withContext(Dispatchers.IO) {
         val client = OkHttpClient()
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +

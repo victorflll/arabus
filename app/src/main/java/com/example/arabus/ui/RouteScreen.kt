@@ -45,13 +45,10 @@ fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel
     val endLatitude = selectedRoute?.destination?.latitude?.toDoubleOrNull() ?: 0.0
     val endLongitude = selectedRoute?.destination?.longitude?.toDoubleOrNull() ?: 0.0
 
-
-
-
-    val startPosition = LatLng(startLatitude, startLongitude)
-    Log.d("RouteScreen", "startPosition: $startPosition")
-    val endPosition = LatLng(endLatitude, endLongitude)
-    Log.d("RouteScreen", "endPosition: $endPosition")
+//    val startPosition = LatLng(startLatitude, startLongitude)
+//    val endPosition = LatLng(endLatitude, endLongitude)
+    val startPosition = LatLng(-9.754, -36.659)
+    val endPosition = LatLng(-9.759, -36.670)
 
 
     Scaffold(
