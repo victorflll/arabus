@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.arabus.FavoritesScreenPath
+import com.example.arabus.FeedbackScreenPath
 import com.example.arabus.HistoryScreenPath
 import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
@@ -113,5 +114,6 @@ private fun App() {
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
         composable(ProfileScreenPath) { ProfileScreen(navController)}
+        composable(FeedbackScreenPath) { FeedbackScreen() }
     }
 }

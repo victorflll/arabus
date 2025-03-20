@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.arabus.FavoritesScreenPath
+import com.example.arabus.FeedbackScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.network.UserManager
@@ -173,6 +175,7 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
                 onClick = {
                     when (label) {
                         "Histórico de Corridas" -> navController.navigate("history")
+                        "Feedback" -> navController.navigate(FeedbackScreenPath)
                         "Termos de Uso" -> downloadDocument(navController.context, "terms_of_use.pdf")
                         "Logout" -> onLogoutClick()
                         else -> {/* Outras ações */}
