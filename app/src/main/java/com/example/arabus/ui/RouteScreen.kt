@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,24 +33,20 @@ import com.google.android.gms.maps.model.LatLng
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel, routeId: String?) {
-
     LaunchedEffect(Unit) {
         routeViewModel.loadRoutes()
     }
 
     val routes by routeViewModel.routes.collectAsState()
     val selectedRoute = routes.find { it.id.toString() == routeId }
-
+    val isLoading = selectedRoute == null
     val startLatitude = selectedRoute?.origin?.latitude?.toDoubleOrNull() ?: 0.0
     val startLongitude = selectedRoute?.origin?.longitude?.toDoubleOrNull() ?: 0.0
     val endLatitude = selectedRoute?.destination?.latitude?.toDoubleOrNull() ?: 0.0
     val endLongitude = selectedRoute?.destination?.longitude?.toDoubleOrNull() ?: 0.0
 
-//    val startPosition = LatLng(startLatitude, startLongitude)
-//    val endPosition = LatLng(endLatitude, endLongitude)
-    val startPosition = LatLng(-9.754, -36.659)
-    val endPosition = LatLng(-9.759, -36.670)
-
+    val startPosition = LatLng(startLatitude, startLongitude)
+    val endPosition = LatLng(endLatitude, endLongitude)
 
     Scaffold(
         topBar = {
@@ -85,7 +82,13 @@ fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            BuildRouteBody(startPosition, endPosition)
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                BuildRouteBody(startPosition, endPosition)
+            }
 
             Box(
                 modifier = Modifier
