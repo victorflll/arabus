@@ -17,17 +17,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.TypographyColor
+import com.example.arabus.ui.view.FeedbackViewModel
+import com.example.arabus.core.request.FeedbackRequest
 
 @Composable
-fun FeedbackScreen() {
+fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewModel = viewModel()) {
     var rating by remember { mutableStateOf(0) }
     var feedbackText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Column(
         modifier = Modifier
@@ -38,7 +44,7 @@ fun FeedbackScreen() {
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {  }) {
+            IconButton(onClick = {navController.popBackStack()}) {
                 Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Voltar")
             }
             Text(text = "Feedback", fontSize = 20.sp, modifier = Modifier.padding(start = 8.dp), color = TypographyColor)
@@ -113,13 +119,30 @@ fun FeedbackScreen() {
 
         Button(
             onClick = {
-                Toast.makeText(context, "Feedback enviado!", Toast.LENGTH_SHORT).show()
+                val request = FeedbackRequest(
+                    comment = feedbackText.text,
+                    rating = rating
+                )
+                viewModel.createFeedback(request) { success ->
+                    if (success) {
+                        Toast.makeText(context, "Feedback enviado com sucesso!", Toast.LENGTH_SHORT).show()
+                        feedbackText = TextFieldValue("")
+                        rating = 0
+                    } else {
+                        Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT).show()
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = AppGreen),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            enabled = !isLoading
         ) {
-            Text(text = "Publicar Feedback", fontSize = 16.sp, color = Color.White)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text(text = "Publicar Feedback", fontSize = 16.sp, color = Color.White)
+            }
         }
     }
 }
@@ -127,5 +150,7 @@ fun FeedbackScreen() {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewFeedbackScreen() {
-    FeedbackScreen()
+    val navController = rememberNavController()
+    val viewModel: FeedbackViewModel = viewModel()
+    FeedbackScreen(navController = navController, viewModel = viewModel)
 }
