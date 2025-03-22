@@ -52,6 +52,7 @@ import com.example.arabus.ui.utils.LoadAsset
 import com.example.arabus.ui.utils.timeDifference
 import com.example.arabus.ui.utils.toFormattedTime
 import com.example.arabus.ui.view.RouteViewModel
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -128,6 +129,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                     items(routes.size) { i ->
                         val route = routes[i]
                         BuildCard(
+                            navController = navController,
                             routeName = "Rota ${route.code}",
                             startTime = route.startedAt.toFormattedTime(),
                             endTime = route.finishedAt.toFormattedTime(),
@@ -137,6 +139,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                             fareInfo = route.cost.takeIf { it > 0 }?.let { "R$ %.2f".format(it) } ?: "Sem tarifa",
                             rating = route.rating.toString(),
                             logo = "arabus-logo",
+                            id =  route.id
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -148,6 +151,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
 
 @Composable
 private fun BuildCard(
+    navController: NavHostController,
     routeName: String,
     startTime: String,
     endTime: String,
@@ -156,7 +160,8 @@ private fun BuildCard(
     duration: String,
     fareInfo: String,
     rating: String,
-    logo: String
+    logo: String,
+    id: UUID
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -250,11 +255,8 @@ private fun BuildCard(
             AppButton(
                 "Visualizar",
                 onClick = {
-                    println("View button clicked for $routeName!")
+                    navController.navigate("route/${id}")
                 },
-                modifier = Modifier.semantics {
-                    contentDescription = "Botão para visualizar detalhes da rota $routeName"
-                }
             )
         }
     }
