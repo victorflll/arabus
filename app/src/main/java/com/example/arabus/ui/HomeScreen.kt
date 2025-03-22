@@ -1,46 +1,44 @@
 package com.example.arabus.ui
 
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.request.FeedbackRequest
 import com.example.arabus.ui.components.AppTextField
+import com.example.arabus.ui.theme.AppGreen
+import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
+import com.example.arabus.ui.view.FeedbackViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import com.example.arabus.ui.theme.AppGreen
-import com.example.arabus.ui.theme.TypographyColor
-
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -50,6 +48,7 @@ fun HomeScreen(navController: NavHostController) {
 
     val textState = remember { mutableStateOf("") }
     val showFeedbackDialog = remember { mutableStateOf(false) }
+    val feedbackViewModel: FeedbackViewModel = viewModel()
 
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -62,13 +61,23 @@ fun HomeScreen(navController: NavHostController) {
                     .padding(32.dp)
                     .semantics { contentDescription = "Campo de busca para digitar o destino desejado" },
                 trailingIcon = {
-                    IconButton(
-                        onClick = { navController.navigate(SearchRouteScreenPath) },
-                        modifier = Modifier.semantics {
-                            contentDescription = "Botão de busca para pesquisar rotas"
+                    Row {
+                        IconButton(
+                            onClick = { showFeedbackDialog.value = true },
+                            modifier = Modifier.semantics {
+                                contentDescription = "Botão temporário para testar envio de feedback"
+                            }
+                        ) {
+                            Icon(imageVector = Icons.Default.Feedback, contentDescription = "Testar Feedback")
                         }
-                    ) {
-                        Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
+                        IconButton(
+                            onClick = { navController.navigate(SearchRouteScreenPath) },
+                            modifier = Modifier.semantics {
+                                contentDescription = "Botão de busca para pesquisar rotas"
+                            }
+                        ) {
+                            Icon(imageVector = Icons.Default.Search, contentDescription = "Buscar")
+                        }
                     }
                 }
             )
@@ -79,8 +88,20 @@ fun HomeScreen(navController: NavHostController) {
         FeedbackDialog(
             onDismiss = { showFeedbackDialog.value = false },
             onSubmit = { rating ->
-                showFeedbackDialog.value = false
-                Toast.makeText(context, "Feedback enviado com $rating estrelas!", Toast.LENGTH_SHORT).show()
+                val request = FeedbackRequest(
+                    rating = rating,
+                    comment = ""
+                )
+                feedbackViewModel.createFeedback(request) { success ->
+                    Handler(Looper.getMainLooper()).post {
+                        showFeedbackDialog.value = false
+                        if (success) {
+                            Toast.makeText(context, "Feedback enviado com sucesso!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }
         )
     }
@@ -99,7 +120,7 @@ fun MapView(textState: MutableState<String>, isTalkBackEnabled: Boolean, showFee
         position = CameraPosition.fromLatLngZoom(initialPosition, 14f)
     }
 
-    var markerPosition by remember { androidx.compose.runtime.mutableStateOf<LatLng?>(null) }
+    var markerPosition by remember { mutableStateOf<LatLng?>(null) }
 
     GoogleMap(
         modifier = Modifier
@@ -164,19 +185,11 @@ fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
                     for (i in 1..5) {
                         IconButton(onClick = { rating = i }) {
                             Icon(
-                                imageVector = Icons.Outlined.Star,
+                                imageVector = Icons.Filled.Star,
                                 contentDescription = "Estrela $i",
-                                tint = Color.White,
+                                tint = if (i <= rating) TypographyColor else Color.White.copy(alpha = 0.3f),
                                 modifier = Modifier.size(36.dp)
                             )
-                            if (i <= rating) {
-                                Icon(
-                                    imageVector = Icons.Filled.Star,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(36.dp).absoluteOffset(x = (-36).dp)
-                                )
-                            }
                         }
                     }
                 }
@@ -202,8 +215,6 @@ fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
     )
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewFeedbackDialog() {
@@ -212,4 +223,3 @@ fun PreviewFeedbackDialog() {
         onSubmit = { rating -> println("Feedback enviado com $rating estrelas!") }
     )
 }
-
