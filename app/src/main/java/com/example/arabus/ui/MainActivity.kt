@@ -5,7 +5,12 @@ import android.os.Bundle
 import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,12 +25,10 @@ import com.example.arabus.LoginRouteScreen
 import com.example.arabus.NotificationScreenPath
 import com.example.arabus.ProfileScreenPath
 import com.example.arabus.RegisterRouteScreen
-import com.example.arabus.RouteScreenPath
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.ui.factories.FavoriteViewModelFactory
-import com.example.arabus.ui.screens.HomeScreen
 import com.example.arabus.ui.screens.RouteScreen
 import com.example.arabus.ui.view.FavoriteViewModel
 import com.example.arabus.ui.view.HistoryViewModel
