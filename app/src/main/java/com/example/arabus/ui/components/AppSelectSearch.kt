@@ -30,11 +30,16 @@ data class Street(
 fun AppSearchSelect(
     items: List<Street>,
     selectedItem: Street? = null,
+    defaultItem: String? = null,
     onSelect: (name: String, lat: Double, lng: Double) -> Unit,
     placeholder: String,
     modifier: Modifier = Modifier
 ) {
-    var input by remember { mutableStateOf(selectedItem?.name ?: "") }
+    var input by remember {
+        mutableStateOf(
+            selectedItem?.name ?: defaultItem ?: ""
+        )
+    }
     var expanded by remember { mutableStateOf(false) }
     var textFieldSize by remember { mutableStateOf(IntSize.Zero) }
     var filteredItems by remember { mutableStateOf<List<Street>>(emptyList()) }
@@ -42,6 +47,14 @@ fun AppSearchSelect(
     val density = LocalDensity.current
     val debounceScope = rememberCoroutineScope()
     var debounceJob by remember { mutableStateOf<Job?>(null) }
+
+    LaunchedEffect(defaultItem) {
+        if (!defaultItem.isNullOrBlank()) {
+            val result = items.filter { it.name.contains(defaultItem, ignoreCase = true) }
+            filteredItems = result
+            expanded = result.isNotEmpty()
+        }
+    }
 
     Column(modifier = modifier.padding(8.dp)) {
         OutlinedTextField(
@@ -101,4 +114,3 @@ fun AppSearchSelect(
         }
     }
 }
-

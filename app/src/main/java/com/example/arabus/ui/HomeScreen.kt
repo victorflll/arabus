@@ -29,8 +29,6 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -39,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.arabus.ui.theme.AppGreen
-import com.example.arabus.ui.theme.TypographyColor
 
 
 @Composable
@@ -63,7 +60,10 @@ fun HomeScreen(navController: NavHostController) {
                     .semantics { contentDescription = "Campo de busca para digitar o destino desejado" },
                 trailingIcon = {
                     IconButton(
-                        onClick = { navController.navigate(SearchRouteScreenPath) },
+                        onClick = {
+                            navController.currentBackStackEntry?.savedStateHandle?.set("origin", textState.value)
+                            navController.navigate(SearchRouteScreenPath)
+                        },
                         modifier = Modifier.semantics {
                             contentDescription = "Botão de busca para pesquisar rotas"
                         }

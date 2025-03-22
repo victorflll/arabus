@@ -36,7 +36,13 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchRouteScreen(navController: NavHostController) {
+fun SearchRouteScreen(navController: NavHostController){
+    val originFromPreviousScreen = navController.previousBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("origin") ?: ""
+
+    println(originFromPreviousScreen)
+
     val context = LocalContext.current
     val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
     val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
@@ -113,6 +119,7 @@ fun SearchRouteScreen(navController: NavHostController) {
                             AppSearchSelect(
                                 items = streets,
                                 placeholder = "Origem",
+                                defaultItem = originFromPreviousScreen,
                                 onSelect = { name, lat, lng ->
                                     println("Selecionado: $name ($lat, $lng)")
                                 }
