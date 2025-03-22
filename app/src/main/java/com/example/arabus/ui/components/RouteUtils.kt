@@ -1,7 +1,6 @@
 package com.example.arabus.ui.screens
 
 import android.content.Context
-import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,7 +14,7 @@ suspend fun getRoute(start: LatLng, end: LatLng, context: Context): List<LatLng>
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=${start.latitude},${start.longitude}" +
                 "&destination=${end.latitude},${end.longitude}" +
-                "&mode=driving&key=AIzaSyB9Q3qkJoDYM8Cgc3nSWKXrrTaX6bvwDvk"
+                "&mode=driving&key=APIKEY"
 
         val request = Request.Builder().url(url).build()
         try {
