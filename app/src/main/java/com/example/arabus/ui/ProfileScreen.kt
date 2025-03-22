@@ -19,9 +19,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.arabus.FavoritesScreenPath
+import com.example.arabus.FeedbackScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.network.UserManager
@@ -30,11 +33,33 @@ import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.LoadAsset
-import com.example.arabus.ui.view.UserViewModel
+import com.example.arabus.ui.components.BaseDialog
+import com.example.arabus.ui.components.DialogType
+import com.example.arabus.ui.utils.downloadDocument
+
+
+@Composable
+fun LogoutDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    BaseDialog(
+        title = "Deseja mesmo fazer logout?",
+        onDismiss = onDismiss,
+        onConfirm = onConfirm,
+        buttonText = "Sair",
+        type = DialogType.Destructive
+    ) {
+        Text(
+            text = "Esta ação é definitiva e você precisará fazer login novamente para acessar o aplicativo.",
+            fontSize = 14.sp,
+            color = Color.Red,
+            textAlign = TextAlign.Center
+        )
+    }
+}
 
 @Composable
 fun ProfileScreen(navController: NavHostController) {
     val user = UserManager.user
+    var showLogoutDialog by remember { mutableStateOf(false) }
 
     ArabusTheme {
         AppScaffold(navController = navController) {
@@ -48,9 +73,19 @@ fun ProfileScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(20.dp))
                 HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = AppLightGrey)
                 Spacer(modifier = Modifier.height(20.dp))
-                ProfileButtonsSection(navController, user)
+                ProfileButtonsSection(navController, user, onLogoutClick = { showLogoutDialog = true })
             }
         }
+    }
+
+    if (showLogoutDialog) {
+        LogoutDialog(
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                navController.navigate("login_route")
+            }
+        )
     }
 }
 
@@ -78,7 +113,7 @@ fun ProfileHeader() {
 }
 
 @Composable
-fun ProfileButtonsSection(navController: NavHostController, user: User?) {
+fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogoutClick: () -> Unit) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -140,7 +175,9 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?) {
                 onClick = {
                     when (label) {
                         "Histórico de Corridas" -> navController.navigate("history")
-                        "Logout" -> {/* Implementar logout */}
+                        "Feedback" -> navController.navigate(FeedbackScreenPath)
+                        "Termos de Uso" -> downloadDocument(navController.context, "terms_of_use.pdf")
+                        "Logout" -> onLogoutClick()
                         else -> {/* Outras ações */}
                     }
                 }
