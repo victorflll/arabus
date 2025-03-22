@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.components.AppSearchSelect
@@ -26,6 +27,8 @@ import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
+import com.example.arabus.ui.view.RouteViewModel
+import com.example.arabus.ui.view.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -41,7 +44,9 @@ fun SearchRouteScreen(navController: NavHostController){
         ?.savedStateHandle
         ?.get<String>("origin") ?: ""
 
-    println(originFromPreviousScreen)
+    val routeViewModel: RouteViewModel = viewModel()
+
+    val routes by routeViewModel.routes.collectAsState()
 
     val context = LocalContext.current
     val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
@@ -50,11 +55,30 @@ fun SearchRouteScreen(navController: NavHostController){
     var origin = remember { mutableStateOf("") }
     var destination = remember { mutableStateOf("") }
 
-    val streets = listOf(
-        Street("Rua das Acácias", -23.5505, -46.6333),
-        Street("Avenida Paulista", -23.5617, -46.6558),
-        Street("Rua Augusta", -23.5556, -46.6500)
-    )
+    LaunchedEffect(Unit) {
+        routeViewModel.loadRoutes()
+    }
+
+    val streetsOrigin = routes
+        .map { route ->
+            Street(
+                name = route.origin.street,
+                latitude = route.origin.latitude.toDouble(),
+                longitude = route.origin.longitude.toDouble()
+            )
+        }
+        .distinctBy { it.name }
+
+    val streetsDestination = routes
+        .map { route ->
+            Street(
+                name = route.destination.street,
+                latitude = route.destination.latitude.toDouble(),
+                longitude = route.destination.longitude.toDouble()
+            )
+        }
+        .distinctBy { it.name }
+
 
     Scaffold(
         topBar = {
@@ -117,7 +141,7 @@ fun SearchRouteScreen(navController: NavHostController){
                                 .padding(horizontal = 4.dp)
                         ) {
                             AppSearchSelect(
-                                items = streets,
+                                items = streetsOrigin,
                                 placeholder = "Origem",
                                 defaultItem = originFromPreviousScreen,
                                 onSelect = { name, lat, lng ->
@@ -126,7 +150,7 @@ fun SearchRouteScreen(navController: NavHostController){
                             )
 
                             AppSearchSelect(
-                                items = streets,
+                                items = streetsDestination,
                                 placeholder = "Destino",
                                 onSelect = { name, lat, lng ->
                                     println("Selecionado: $name ($lat, $lng)")
