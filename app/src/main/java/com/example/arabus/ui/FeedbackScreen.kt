@@ -1,11 +1,15 @@
 package com.example.arabus.ui
 
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
@@ -27,6 +31,7 @@ import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.view.FeedbackViewModel
 import com.example.arabus.core.request.FeedbackRequest
+import androidx.navigation.NavController
 
 @Composable
 fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewModel = viewModel()) {
@@ -44,10 +49,19 @@ fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewMode
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = {navController.popBackStack()}) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Voltar")
+            IconButton(onClick = {
+                if (!navController.popBackStack()) {
+                    navController.navigate("profile")
+                }
+            }) {
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
             }
-            Text(text = "Feedback", fontSize = 20.sp, modifier = Modifier.padding(start = 8.dp), color = TypographyColor)
+            Text(
+                text = "Feedback",
+                fontSize = 20.sp,
+                modifier = Modifier.padding(start = 8.dp),
+                color = TypographyColor
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -61,24 +75,19 @@ fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewMode
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            for (i in 1..5) {
-                IconButton(onClick = { rating = i }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Star,
-                        contentDescription = "Estrela $i",
-                        tint = TypographyColor,
-                        modifier = Modifier.size(40.dp)
-                    )
-                    if (i <= rating) {
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null,
-                            tint = TypographyColor,
-                            modifier = Modifier.size(40.dp).absoluteOffset(x = (-40).dp)
-                        )
-                    }
-                }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            (1..5).forEach { i ->
+                Icon(
+                    imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                    contentDescription = "Estrela $i",
+                    tint = if (i <= rating) TypographyColor else TypographyColor.copy(alpha = 0.3f),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable { rating = i }
+                )
             }
         }
 
@@ -124,12 +133,15 @@ fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewMode
                     rating = rating
                 )
                 viewModel.createFeedback(request) { success ->
-                    if (success) {
-                        Toast.makeText(context, "Feedback enviado com sucesso!", Toast.LENGTH_SHORT).show()
-                        feedbackText = TextFieldValue("")
-                        rating = 0
-                    } else {
-                        Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT).show()
+                    Handler(Looper.getMainLooper()).post {
+                        if (success) {
+                            Toast.makeText(context, "Feedback enviado com sucesso!", Toast.LENGTH_SHORT).show()
+                            feedbackText = TextFieldValue("")
+                            rating = 0
+                            navController.popBackStack()
+                        } else {
+                            Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             },
