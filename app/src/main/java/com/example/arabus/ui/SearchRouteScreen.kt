@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,13 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.ViewRouteScreenPath
+import com.example.arabus.components.AppSearchSelect
+import com.example.arabus.components.Street
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
-import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
@@ -44,6 +43,12 @@ fun SearchRouteScreen(navController: NavHostController) {
 
     var origin = remember { mutableStateOf("") }
     var destination = remember { mutableStateOf("") }
+
+    val streets = listOf(
+        Street("Rua das Acácias", -23.5505, -46.6333),
+        Street("Avenida Paulista", -23.5617, -46.6558),
+        Street("Rua Augusta", -23.5556, -46.6500)
+    )
 
     Scaffold(
         topBar = {
@@ -105,32 +110,19 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 .weight(1f)
                                 .padding(horizontal = 4.dp)
                         ) {
-                            AppTextField(
-                                placeholder = "Seu local",
-                                textState = origin.value,
-                                onValueChange = { origin.value = it },
-                                modifier = Modifier.semantics {
-                                    contentDescription = "Campo de entrada para o local de origem"
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
-                                    )
+                            AppSearchSelect(
+                                items = streets,
+                                placeholder = "Origem",
+                                onSelect = { name, lat, lng ->
+                                    println("Selecionado: $name ($lat, $lng)")
                                 }
                             )
-                            AppTextField(
+
+                            AppSearchSelect(
+                                items = streets,
                                 placeholder = "Destino",
-                                textState = destination.value,
-                                onValueChange = { destination.value = it },
-                                modifier = Modifier.semantics {
-                                    contentDescription = "Campo de entrada para o destino"
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
-                                    )
+                                onSelect = { name, lat, lng ->
+                                    println("Selecionado: $name ($lat, $lng)")
                                 }
                             )
                         }
@@ -235,8 +227,8 @@ fun GoogleMapComposable() {
     )
 }
 
-@Composable
-@Preview
-private fun Preview() {
-    SearchRouteScreen(navController = NavHostController(LocalContext.current))
-}
+//@Composable
+//@Preview
+//private fun Preview() {
+//    SearchRouteScreen(navController = NavHostController(LocalContext.current))
+//}
