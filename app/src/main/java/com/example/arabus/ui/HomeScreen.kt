@@ -1,42 +1,41 @@
 package com.example.arabus.ui
 
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.components.AppScaffold
+import com.example.arabus.core.request.FeedbackRequest
 import com.example.arabus.ui.components.AppTextField
+import com.example.arabus.ui.theme.AppGreen
+import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
+import com.example.arabus.ui.view.FeedbackViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.*
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import com.example.arabus.ui.theme.AppGreen
 
 
 @Composable
@@ -48,6 +47,8 @@ fun HomeScreen(navController: NavHostController) {
     val textState = remember { mutableStateOf("") }
     val showFeedbackDialog = remember { mutableStateOf(false) }
 
+    val feedbackViewModel: FeedbackViewModel = viewModel()
+
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
             BuildBody(textState, isTalkBackEnabled, showFeedbackDialog)
@@ -57,11 +58,16 @@ fun HomeScreen(navController: NavHostController) {
                 onValueChange = { textState.value = it },
                 modifier = Modifier
                     .padding(32.dp)
-                    .semantics { contentDescription = "Campo de busca para digitar o destino desejado" },
+                    .semantics {
+                        contentDescription = "Campo de busca para digitar o destino desejado"
+                    },
                 trailingIcon = {
                     IconButton(
                         onClick = {
-                            navController.currentBackStackEntry?.savedStateHandle?.set("origin", textState.value)
+                            navController.currentBackStackEntry?.savedStateHandle?.set(
+                                "origin",
+                                textState.value
+                            )
                             navController.navigate(SearchRouteScreenPath)
                         },
                         modifier = Modifier.semantics {
@@ -79,27 +85,58 @@ fun HomeScreen(navController: NavHostController) {
         FeedbackDialog(
             onDismiss = { showFeedbackDialog.value = false },
             onSubmit = { rating ->
-                showFeedbackDialog.value = false
-                Toast.makeText(context, "Feedback enviado com $rating estrelas!", Toast.LENGTH_SHORT).show()
+                val request = FeedbackRequest(
+                    rating = rating,
+                    comment = ""
+                )
+                feedbackViewModel.createFeedback(request) { success ->
+                    Handler(Looper.getMainLooper()).post {
+                        showFeedbackDialog.value = false
+                        if (success) {
+                            Toast.makeText(
+                                context,
+                                "Feedback enviado com sucesso!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
             }
         )
     }
 }
 
 @Composable
-private fun BuildBody(textState: MutableState<String>, isTalkBackEnabled: Boolean, showFeedbackDialog: MutableState<Boolean>) {
-    Permissions.RequestLocationPermission { MapView(textState, isTalkBackEnabled, showFeedbackDialog) }
+private fun BuildBody(
+    textState: MutableState<String>,
+    isTalkBackEnabled: Boolean,
+    showFeedbackDialog: MutableState<Boolean>
+) {
+    Permissions.RequestLocationPermission {
+        MapView(
+            textState,
+            isTalkBackEnabled,
+            showFeedbackDialog
+        )
+    }
 }
 
 @Composable
-fun MapView(textState: MutableState<String>, isTalkBackEnabled: Boolean, showFeedbackDialog: MutableState<Boolean>) {
+fun MapView(
+    textState: MutableState<String>,
+    isTalkBackEnabled: Boolean,
+    showFeedbackDialog: MutableState<Boolean>
+) {
     val context = LocalContext.current
     val initialPosition = LatLng(-9.754, -36.659)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(initialPosition, 14f)
     }
 
-    var markerPosition by remember { androidx.compose.runtime.mutableStateOf<LatLng?>(null) }
+    var markerPosition by remember { mutableStateOf<LatLng?>(null) }
 
     GoogleMap(
         modifier = Modifier
@@ -113,7 +150,11 @@ fun MapView(textState: MutableState<String>, isTalkBackEnabled: Boolean, showFee
             textState.value = "Lat: ${latLng.latitude}, Lng: ${latLng.longitude}"
 
             if (isTalkBackEnabled) {
-                Toast.makeText(context, "Localização selecionada: ${latLng.latitude}, ${latLng.longitude}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Localização selecionada: ${latLng.latitude}, ${latLng.longitude}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     ) {
@@ -129,7 +170,7 @@ fun MapView(textState: MutableState<String>, isTalkBackEnabled: Boolean, showFee
 
 @Composable
 fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
-    var rating by remember { mutableStateOf(0) }
+    var rating by remember { mutableIntStateOf(0) }
     var isButtonPressed by remember { mutableStateOf(false) }
 
     AlertDialog(
@@ -164,19 +205,11 @@ fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
                     for (i in 1..5) {
                         IconButton(onClick = { rating = i }) {
                             Icon(
-                                imageVector = Icons.Outlined.Star,
+                                imageVector = Icons.Filled.Star,
                                 contentDescription = "Estrela $i",
-                                tint = Color.White,
+                                tint = if (i <= rating) TypographyColor else Color.White.copy(alpha = 0.3f),
                                 modifier = Modifier.size(36.dp)
                             )
-                            if (i <= rating) {
-                                Icon(
-                                    imageVector = Icons.Filled.Star,
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(36.dp).absoluteOffset(x = (-36).dp)
-                                )
-                            }
                         }
                     }
                 }
@@ -201,8 +234,6 @@ fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
         }
     )
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
