@@ -8,7 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-suspend fun getRoute(start: LatLng, end: LatLng, context: Context): List<LatLng> {
+suspend fun getRoute(start: LatLng, end: LatLng, context: Context): Triple<List<LatLng>, String?, String?> {
     return withContext(Dispatchers.IO) {
         val client = OkHttpClient()
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +
@@ -20,13 +20,22 @@ suspend fun getRoute(start: LatLng, end: LatLng, context: Context): List<LatLng>
         try {
             val response = client.newCall(request).execute()
             val jsonData = response.body?.string() ?: ""
-            val routesArray = JSONObject(jsonData).optJSONArray("routes") ?: return@withContext emptyList()
+            val routesArray = JSONObject(jsonData).optJSONArray("routes") ?: return@withContext Triple(emptyList(), null, null)
+
             if (routesArray.length() > 0) {
-                val encodedPoints = routesArray.getJSONObject(0).getJSONObject("overview_polyline").getString("points")
-                return@withContext decodePolyline(encodedPoints)
+                val route = routesArray.getJSONObject(0)
+                val overviewPolyline = route.getJSONObject("overview_polyline").getString("points")
+                val polyline = decodePolyline(overviewPolyline)
+
+                val leg = route.getJSONArray("legs").getJSONObject(0)
+                val duration = leg.getJSONObject("duration")
+                val estimatedTime = duration.getString("text")
+                val distance = leg.getJSONObject("distance").getString("text")
+
+                return@withContext Triple(polyline, estimatedTime, distance)
             }
         } catch (_: Exception) {}
-        emptyList()
+        Triple(emptyList(), null, null)
     }
 }
 
