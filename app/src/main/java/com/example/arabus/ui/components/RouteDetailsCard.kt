@@ -63,7 +63,7 @@ fun RouteDetailsCard(route: Route, onClose: () -> Unit) {
                     .clip(RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                LoadAsset.PngExtension("arabus-logo", width = 120.dp, height = 120.dp, tint = Color.Black)
+                LoadAsset.PngExtension("arabus-logo", width = 120.dp, height = 120.dp)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
