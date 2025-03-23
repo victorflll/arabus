@@ -3,16 +3,39 @@ package com.example.arabus.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Policy
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,18 +46,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.FeedbackScreenPath
 import com.example.arabus.components.AppScaffold
 import com.example.arabus.core.domain.user.User
 import com.example.arabus.core.network.UserManager
+import com.example.arabus.ui.components.BaseDialog
+import com.example.arabus.ui.components.DialogType
 import com.example.arabus.ui.theme.AppGreenOpacity
 import com.example.arabus.ui.theme.AppLightGrey
 import com.example.arabus.ui.theme.ArabusTheme
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.LoadAsset
-import com.example.arabus.ui.components.BaseDialog
-import com.example.arabus.ui.components.DialogType
 import com.example.arabus.ui.utils.downloadDocument
 
 
@@ -71,9 +93,16 @@ fun ProfileScreen(navController: NavHostController) {
                 Spacer(modifier = Modifier.height(36.dp))
                 ProfileHeader()
                 Spacer(modifier = Modifier.height(20.dp))
-                HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = AppLightGrey)
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    thickness = 1.dp,
+                    color = AppLightGrey
+                )
                 Spacer(modifier = Modifier.height(20.dp))
-                ProfileButtonsSection(navController, user, onLogoutClick = { showLogoutDialog = true })
+                ProfileButtonsSection(
+                    navController,
+                    user,
+                    onLogoutClick = { showLogoutDialog = true })
             }
         }
     }
@@ -99,12 +128,10 @@ fun ProfileHeader() {
             contentDescription = "Ícone de perfil",
             modifier = Modifier
                 .padding(start = 26.dp)
-                .size(32.dp), // 🔹 Melhorando tamanho do ícone
+                .size(32.dp),
             tint = TypographyColor
         )
-
         Spacer(modifier = Modifier.width(12.dp))
-
         Text(
             text = "Perfil",
             style = MaterialTheme.typography.titleLarge.copy(color = TypographyColor)
@@ -113,10 +140,13 @@ fun ProfileHeader() {
 }
 
 @Composable
-fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogoutClick: () -> Unit) {
+fun ProfileButtonsSection(
+    navController: NavHostController,
+    user: User?,
+    onLogoutClick: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -128,13 +158,21 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
                     .background(AppLightGrey),
                 contentAlignment = Alignment.Center
             ) {
-                LoadAsset.PngExtension("real-logo", width = 64.dp, height = 64.dp)
+                Box(
+                    modifier = Modifier
+                        .padding(all = 8.dp)
+                ) {
+                    LoadAsset.PngExtension(
+                        "arabus-logo",
+                        width = 64.dp,
+                        height = 64.dp,
+                        tint = Color.Black
+                    )
+                }
             }
-
             Spacer(modifier = Modifier.width(16.dp))
-
             Column(
-                horizontalAlignment = Alignment.Start // 🔹 Melhorando alinhamento
+                horizontalAlignment = Alignment.Start
             ) {
                 Text(
                     text = user?.profile?.name ?: "Nome não disponível",
@@ -147,13 +185,9 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
             }
         }
     }
-
     Spacer(modifier = Modifier.height(18.dp))
-
     HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = AppLightGrey)
-
     Spacer(modifier = Modifier.height(18.dp))
-
     Column {
         val buttons = listOf(
             Triple("Editar Minhas Informações", Icons.Default.Edit, false),
@@ -179,9 +213,15 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
                             launchSingleTop = true
                             restoreState = true
                         }
-                        "Termos de Uso" -> downloadDocument(navController.context, "terms_of_use.pdf")
+
+                        "Termos de Uso" -> downloadDocument(
+                            navController.context,
+                            "terms_of_use.pdf"
+                        )
+
                         "Logout" -> onLogoutClick()
-                        else -> {/* Outras ações */}
+                        else -> {/* Outras ações */
+                        }
                     }
                 }
             )
@@ -191,7 +231,13 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
 }
 
 @Composable
-fun ProfileButton(label: String, icon: ImageVector, hasDownloadIcon: Boolean, isLogout: Boolean = false, onClick: () -> Unit) {
+fun ProfileButton(
+    label: String,
+    icon: ImageVector,
+    hasDownloadIcon: Boolean,
+    isLogout: Boolean = false,
+    onClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .padding(horizontal = 14.dp)

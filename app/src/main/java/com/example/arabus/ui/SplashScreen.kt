@@ -3,7 +3,6 @@ package com.example.arabus.ui
 import android.content.Context
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
 import com.example.arabus.SplashScreenPath
+import com.example.arabus.core.network.UserManager
 import com.example.arabus.repository.database.DatabaseInstance
 import com.example.arabus.repository.database.DatabaseSeeder
 import com.example.arabus.ui.theme.AppGreen
@@ -49,8 +50,14 @@ fun SplashScreen(navController: NavHostController, context: Context) {
 
     if (isDatabaseReady && hasWaitedMinimumTime) {
         LaunchedEffect(Unit) {
-            navController.navigate(LoginRouteScreen) {
-                popUpTo(SplashScreenPath) { inclusive = true }
+            if (UserManager.hasUser()) {
+                navController.navigate(HomeScreenPath) {
+                    popUpTo(SplashScreenPath) { inclusive = true }
+                }
+            } else {
+                navController.navigate(LoginRouteScreen) {
+                    popUpTo(SplashScreenPath) { inclusive = true }
+                }
             }
         }
     }
