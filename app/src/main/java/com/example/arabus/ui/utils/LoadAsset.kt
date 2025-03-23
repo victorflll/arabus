@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +20,8 @@ class LoadAsset {
             path: String,
             width: Dp = 64.dp,
             height: Dp = 64.dp,
-            description: String = "..."
+            description: String = "...",
+            tint: Color? = null
         ) {
             val context = LocalContext.current
             val inputStream = context.assets.open("$path.png")
@@ -28,6 +31,7 @@ class LoadAsset {
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = description,
                 modifier = Modifier.size(width = width, height = height),
+                colorFilter = tint?.let { ColorFilter.tint(it) }
             )
         }
 

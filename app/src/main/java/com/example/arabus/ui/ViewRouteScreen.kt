@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -189,7 +191,7 @@ private fun BuildCard(
                 .padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                LoadAsset.PngExtension(logo)
+                LoadAsset.PngExtension(logo, tint = Color.Black)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
@@ -211,14 +213,14 @@ private fun BuildCard(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
-                    Icons.Outlined.Favorite,
-                    contentDescription = "Ícone de favorito",
+                    Icons.Outlined.Info,
+                    contentDescription = "Ícone de informação",
                     modifier = Modifier.semantics {
-                        contentDescription = "Ícone para favoritar a rota"
+                        contentDescription = "Ícone para exemplificar que trata-se de informações da rota"
                     }
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
@@ -271,3 +273,20 @@ private fun BuildCard(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewBuildCard() {
+    BuildCard(
+        navController = NavHostController(LocalContext.current),
+        routeName = "Rota 001",
+        startTime = "08:00",
+        endTime = "09:00",
+        startLocation = "Av. Paulista",
+        endLocation = "Rua Augusta",
+        duration = "1h",
+        fareInfo = "R$ 4,50",
+        rating = "4.8",
+        logo = "arabus-logo",
+        id = UUID.randomUUID()
+    )
+}

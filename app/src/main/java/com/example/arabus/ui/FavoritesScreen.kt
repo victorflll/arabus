@@ -32,6 +32,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -187,7 +188,7 @@ fun FavoriteRouteCard(route: FavoriteRoute) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                LoadAsset.PngExtension(route.logo, width = 84.dp, height = 84.dp)
+                LoadAsset.PngExtension(route.logo, width = 84.dp, height = 84.dp, tint = Color.Black)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.Start) {
                     Text(text = route.line, color = AppBlack)
