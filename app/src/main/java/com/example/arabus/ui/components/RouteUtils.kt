@@ -21,7 +21,7 @@ suspend fun getRoute(start: LatLng, end: LatLng, context: Context): Triple<List<
         val url = "https://maps.googleapis.com/maps/api/directions/json?" +
                 "origin=${start.latitude},${start.longitude}" +
                 "&destination=${end.latitude},${end.longitude}" +
-                "&mode=driving&key=AIzaSyD8Afq5eFx6Lh7Ff__LB0cnv29GPD9_U6A"
+                "&mode=driving&key=APIKEY"
 
         val request = Request.Builder().url(url).build()
         try {
