@@ -1,6 +1,7 @@
 package com.example.arabus.ui
 
 import android.app.Application
+import android.net.Uri
 import android.os.Bundle
 import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
@@ -74,11 +75,26 @@ private fun App() {
         }
         composable(HomeScreenPath) { HomeScreen(navController) }
         composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
-        composable(ViewRouteScreenPath) {
+
+//        composable("route/{id}") { backStackEntry ->
+//            val viewModelStoreOwner = LocalViewModelStoreOwner.current
+//            viewModelStoreOwner?.let { owner ->
+//                val routeViewModel: RouteViewModel = viewModel(owner)
+//
+//                val routeId = backStackEntry.arguments?.getString("id")
+//
+//                RouteScreen(navController = navController, routeViewModel = routeViewModel, routeId = routeId)
+//            }
+//        }
+        composable("view_route/{origin}/{destination}") { backStackEntry ->
             val viewModelStoreOwner = LocalViewModelStoreOwner.current
             viewModelStoreOwner?.let { owner ->
                 val routeViewModel: RouteViewModel = viewModel(owner)
-                ViewRouteScreen(navController = navController, routeViewModel = routeViewModel)
+
+                val origin = backStackEntry.arguments?.getString("origin")
+                val destination = backStackEntry.arguments?.getString("destination")
+
+                ViewRouteScreen(navController = navController, routeViewModel = routeViewModel, origin, destination)
             }
         }
         composable(HistoryScreenPath) {
