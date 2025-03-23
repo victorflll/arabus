@@ -28,7 +28,6 @@ import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
 import com.example.arabus.ui.view.RouteViewModel
-import com.example.arabus.ui.view.UserViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -52,8 +51,8 @@ fun SearchRouteScreen(navController: NavHostController){
     val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
     val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
 
-    var origin = remember { mutableStateOf("") }
-    var destination = remember { mutableStateOf("") }
+    val origin = remember { mutableStateOf<Street?>(null) }
+    val destination = remember { mutableStateOf<Street?>(null) }
 
     LaunchedEffect(Unit) {
         routeViewModel.loadRoutes()
@@ -70,6 +69,7 @@ fun SearchRouteScreen(navController: NavHostController){
         .distinctBy { it.name }
 
     val streetsDestination = routes
+        .filter { it.origin.street == origin.value?.name}
         .map { route ->
             Street(
                 name = route.destination.street,
@@ -145,7 +145,7 @@ fun SearchRouteScreen(navController: NavHostController){
                                 placeholder = "Origem",
                                 defaultItem = originFromPreviousScreen,
                                 onSelect = { name, lat, lng ->
-                                    println("Selecionado: $name ($lat, $lng)")
+                                    origin.value = Street(name, lat, lng)
                                 }
                             )
 
@@ -153,31 +153,8 @@ fun SearchRouteScreen(navController: NavHostController){
                                 items = streetsDestination,
                                 placeholder = "Destino",
                                 onSelect = { name, lat, lng ->
-                                    println("Selecionado: $name ($lat, $lng)")
+                                    destination.value = Street(name, lat, lng)
                                 }
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clickable {
-                                    val aux = origin.value
-                                    origin.value = destination.value
-                                    destination.value = aux
-
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(
-                                            context,
-                                            "Origem e destino trocados",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                                .semantics { contentDescription = "Botão para inverter origem e destino" }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.SwapVert,
-                                contentDescription = "Swap Icon",
-                                tint = AppWhite
                             )
                         }
                     }
