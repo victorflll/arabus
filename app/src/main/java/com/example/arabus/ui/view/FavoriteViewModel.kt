@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
     private val favoriteRepository = FavoriteRepository()
@@ -23,10 +24,39 @@ class FavoriteViewModel(application: Application) : AndroidViewModel(application
     fun getFavoritesByUserId(favoriteRequest: FavoriteRequest, onResult: (List<FavoriteDomain>) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
-            val apiFavorites = favoriteRepository.getFavoritesByUserId(favoriteRequest)
-            _favorites.value = apiFavorites
-            onResult(apiFavorites)
+            val result = favoriteRepository.getFavoritesByUserId(favoriteRequest)
+            _favorites.value = result
+            onResult(result)
             _isLoading.value = false
         }
     }
+
+    fun favoriteRoute(userId: UUID, routeId: UUID, onComplete: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val request = FavoriteRequest(userId = userId, routeId = routeId)
+                favoriteRepository.saveFavorite(request)
+                val updated = favoriteRepository.getFavoritesByUserId(request)
+                _favorites.value = updated
+                onComplete()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun unfavoriteRoute(userId: UUID, routeId: UUID, onComplete: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                favoriteRepository.deleteFavorite(userId, routeId)
+                val updated = favoriteRepository.getFavoritesByUserId(FavoriteRequest(userId))
+                _favorites.value = updated
+                onComplete()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
 }

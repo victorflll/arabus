@@ -29,7 +29,6 @@ import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
 import com.example.arabus.ui.factories.FavoriteViewModelFactory
-import com.example.arabus.ui.screens.RouteScreen
 import com.example.arabus.ui.view.FavoriteViewModel
 import com.example.arabus.ui.view.HistoryViewModel
 import com.example.arabus.ui.view.NotificationViewModel
@@ -122,12 +121,22 @@ private fun App() {
         composable(ProfileScreenPath) { ProfileScreen(navController)}
         composable("route/{id}") { backStackEntry ->
             val viewModelStoreOwner = LocalViewModelStoreOwner.current
+            val application = LocalContext.current.applicationContext as Application
+
             viewModelStoreOwner?.let { owner ->
                 val routeViewModel: RouteViewModel = viewModel(owner)
+                val favoriteViewModel: FavoriteViewModel = viewModel(
+                    owner,
+                    factory = FavoriteViewModelFactory(application, routeViewModel)
+                )
 
                 val routeId = backStackEntry.arguments?.getString("id")
-
-                RouteScreen(navController = navController, routeViewModel = routeViewModel, routeId = routeId)
+                RouteScreen(
+                    navController = navController,
+                    routeViewModel = routeViewModel,
+                    routeId = routeId,
+                    favoriteViewModel = favoriteViewModel
+                )
             }
         }
         composable(FeedbackScreenPath) { FeedbackScreen() }
