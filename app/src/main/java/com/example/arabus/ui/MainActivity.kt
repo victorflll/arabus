@@ -131,6 +131,6 @@ private fun App() {
                 RouteScreen(navController = navController, routeViewModel = routeViewModel, routeId = routeId)
             }
         }
-        composable(FeedbackScreenPath) { FeedbackScreen() }
+        composable(FeedbackScreenPath) { FeedbackScreen(navController) }
     }
 }

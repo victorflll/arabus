@@ -31,11 +31,10 @@ import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.view.FeedbackViewModel
 import com.example.arabus.core.request.FeedbackRequest
-import androidx.navigation.NavController
 
 @Composable
 fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewModel = viewModel()) {
-    var rating by remember { mutableStateOf(0) }
+    var rating by remember { mutableIntStateOf(0) }
     var feedbackText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
     val isLoading by viewModel.isLoading.collectAsState()
@@ -50,7 +49,7 @@ fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewMode
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "Voltar")
+                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar")
             }
             Text(
                 text = "Feedback",
