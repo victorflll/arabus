@@ -1,6 +1,7 @@
 package com.example.arabus.ui
 
 import android.app.Application
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.arabus.core.domain.route.Route
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
 import com.example.arabus.ui.theme.AppBlack
@@ -56,9 +58,16 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewModel) {
+fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewModel, originEncoded: String?, destinationEncoded: String?) {
     val routes by routeViewModel.routes.collectAsState()
     val isLoading by routeViewModel.isLoading.collectAsState()
+
+    val origin = Uri.decode(originEncoded)
+    val destination = Uri.decode(destinationEncoded)
+
+    val availableRoutes: List<Route?> = routes.filter { it.origin.street == origin && it.destination.street == destination }
+
+    println(availableRoutes)
 
     LaunchedEffect(Unit) {
         routeViewModel.loadRoutes()
@@ -111,7 +120,7 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                         }
                     )
                 }
-            } else if (routes.isEmpty()) {
+            } else if (availableRoutes.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -126,8 +135,8 @@ fun ViewRouteScreen(navController: NavHostController, routeViewModel: RouteViewM
                 }
             } else {
                 LazyColumn(modifier = Modifier.padding(top = 16.dp, start = 16.dp, end = 16.dp)) {
-                    items(routes.size) { i ->
-                        val route = routes[i]
+                    items(availableRoutes.size) { i ->
+                        val route = availableRoutes[i]!!
                         BuildCard(
                             navController = navController,
                             routeName = "Rota ${route.code}",
@@ -262,10 +271,3 @@ private fun BuildCard(
     }
 }
 
-@Composable
-@Preview
-private fun Preview() {
-    val navController = NavHostController(LocalContext.current)
-    val mockViewModel = RouteViewModel(Application())
-    ViewRouteScreen(navController, mockViewModel)
-}

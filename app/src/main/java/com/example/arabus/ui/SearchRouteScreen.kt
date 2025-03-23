@@ -1,5 +1,6 @@
 package com.example.arabus.ui
 
+import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -172,7 +173,12 @@ fun SearchRouteScreen(navController: NavHostController){
                         AppButton(
                             title = "Verificar rotas",
                             onClick = {
-                                navController.navigate(ViewRouteScreenPath)
+
+
+                                val originEncoded = Uri.encode(origin.value?.name?: "")
+                                val destinationEncoded = Uri.encode(destination.value?.name ?: "")
+
+                                navController.navigate("view_route/${originEncoded}/${destinationEncoded}")
                                 if (isTalkBackEnabled) {
                                     Toast.makeText(
                                         context,
