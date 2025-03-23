@@ -26,6 +26,7 @@ import com.example.arabus.components.AppScaffold
 import com.example.arabus.core.request.FeedbackRequest
 import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
+import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.theme.TypographyColor
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
@@ -209,7 +210,7 @@ fun FeedbackDialog(onDismiss: () -> Unit, onSubmit: (Int) -> Unit) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = "Estrela $i",
-                                tint = if (i <= rating) TypographyColor else Color.White.copy(alpha = 0.3f),
+                                tint = if (i <= rating) AppWhite else Color.White.copy(alpha = 0.3f),
                                 modifier = Modifier.size(36.dp)
                             )
                         }
