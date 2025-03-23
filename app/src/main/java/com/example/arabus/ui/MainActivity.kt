@@ -114,6 +114,6 @@ private fun App() {
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
         composable(ProfileScreenPath) { ProfileScreen(navController)}
-        composable(FeedbackScreenPath) { FeedbackScreen() }
+        composable(FeedbackScreenPath) { FeedbackScreen(navController) }
     }
 }
