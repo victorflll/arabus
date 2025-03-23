@@ -1,6 +1,7 @@
 package com.example.arabus.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,15 +22,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.arabus.core.network.UserManager
 import com.example.arabus.core.request.FavoriteRequest
 import com.example.arabus.ui.components.AppButton
+import com.example.arabus.ui.components.RouteDetailsCard
 import com.example.arabus.ui.screens.RouteMapView
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.view.FavoriteViewModel
@@ -41,6 +42,8 @@ import java.util.UUID
 @Composable
 fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel, routeId: String?, favoriteViewModel: FavoriteViewModel
 ) {
+    var showDetails by remember { mutableStateOf(false) }
+
     val userId = UserManager.id
 
     val routes by routeViewModel.routes.collectAsState()
@@ -116,17 +119,26 @@ fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel
                 BuildRouteBody(startPosition, endPosition)
             }
 
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 84.dp)
                     .align(Alignment.BottomCenter)
             ) {
-                AppButton(
-                    "Mais informações",
-                    onClick = { println("Mais informações") },
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                if (!showDetails) {
+                    AppButton(
+                        "Mais informações",
+                        onClick = { showDetails = true },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(bottom = 16.dp)
+                    )
+                } else {
+                    if (selectedRoute != null) {
+                        RouteDetailsCard(selectedRoute) {
+                            showDetails = false
+                        }
+                    }
+                }
             }
         }
     }
