@@ -1,7 +1,6 @@
 package com.example.arabus.ui
 
 import android.app.Application
-import android.net.Uri
 import android.os.Bundle
 import android.view.accessibility.AccessibilityManager
 import androidx.activity.ComponentActivity
@@ -21,11 +20,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.arabus.FavoritesScreenPath
 import com.example.arabus.FeedbackScreenPath
 import com.example.arabus.HistoryScreenPath
-import com.example.arabus.HomeScreenPath
 import com.example.arabus.LoginRouteScreen
 import com.example.arabus.NotificationScreenPath
 import com.example.arabus.ProfileScreenPath
 import com.example.arabus.RegisterRouteScreen
+import com.example.arabus.RouteScreenPath
 import com.example.arabus.SearchRouteScreenPath
 import com.example.arabus.SplashScreenPath
 import com.example.arabus.ViewRouteScreenPath
@@ -52,7 +51,11 @@ private fun App() {
     val accessibilityManager = remember {
         context.getSystemService(AccessibilityManager::class.java)
     }
-    var isTalkBackEnabled by remember { mutableStateOf(accessibilityManager?.isTouchExplorationEnabled ?: false) }
+    var isTalkBackEnabled by remember {
+        mutableStateOf(
+            accessibilityManager?.isTouchExplorationEnabled ?: false
+        )
+    }
 
     DisposableEffect(accessibilityManager) {
         val listener = AccessibilityManager.AccessibilityStateChangeListener {
@@ -72,20 +75,17 @@ private fun App() {
             val context = LocalContext.current
             SplashScreen(navController = navController, context = context)
         }
-        composable(HomeScreenPath) { HomeScreen(navController) }
-        composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
+        composable("home") { backStackEntry ->
+            val enableFeedbackDialog =
+                backStackEntry.savedStateHandle.get<Boolean>("enableFeedbackDialog") ?: false
 
-//        composable("route/{id}") { backStackEntry ->
-//            val viewModelStoreOwner = LocalViewModelStoreOwner.current
-//            viewModelStoreOwner?.let { owner ->
-//                val routeViewModel: RouteViewModel = viewModel(owner)
-//
-//                val routeId = backStackEntry.arguments?.getString("id")
-//
-//                RouteScreen(navController = navController, routeViewModel = routeViewModel, routeId = routeId)
-//            }
-//        }
-        composable("view_route/{origin}/{destination}") { backStackEntry ->
+            HomeScreen(
+                navController = navController,
+                enableFeedbackDialog = enableFeedbackDialog
+            )
+        }
+        composable(SearchRouteScreenPath) { SearchRouteScreen(navController) }
+        composable("${ViewRouteScreenPath}/{origin}/{destination}") { backStackEntry ->
             val viewModelStoreOwner = LocalViewModelStoreOwner.current
             viewModelStoreOwner?.let { owner ->
                 val routeViewModel: RouteViewModel = viewModel(owner)
@@ -93,7 +93,12 @@ private fun App() {
                 val origin = backStackEntry.arguments?.getString("origin")
                 val destination = backStackEntry.arguments?.getString("destination")
 
-                ViewRouteScreen(navController = navController, routeViewModel = routeViewModel, origin, destination)
+                ViewRouteScreen(
+                    navController = navController,
+                    routeViewModel = routeViewModel,
+                    origin,
+                    destination
+                )
             }
         }
         composable(HistoryScreenPath) {
@@ -129,14 +134,14 @@ private fun App() {
                     navController = navController,
                     viewModel = favoriteViewModel,
 
-                )
+                    )
             }
         }
         composable(LoginRouteScreen) { ViewLoginScreen(navController) }
         composable(RegisterRouteScreen) { ViewRegisterScreen(navController) }
-        composable(ProfileScreenPath) { ProfileScreen(navController)}
+        composable(ProfileScreenPath) { ProfileScreen(navController) }
         composable(FeedbackScreenPath) { FeedbackScreen(navController) }
-        composable("route/{id}") { backStackEntry ->
+        composable("${RouteScreenPath}/{id}") { backStackEntry ->
             val viewModelStoreOwner = LocalViewModelStoreOwner.current
             val application = LocalContext.current.applicationContext as Application
 

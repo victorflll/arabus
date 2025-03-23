@@ -39,7 +39,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, enableFeedbackDialog: Boolean = false) {
     val context = LocalContext.current
     val sharedPrefManager = remember { SharedPreferenceManager(context) }
     val isTalkBackEnabled = sharedPrefManager.isTalkBackEnabled()
@@ -48,6 +48,8 @@ fun HomeScreen(navController: NavHostController) {
     val showFeedbackDialog = remember { mutableStateOf(false) }
 
     val feedbackViewModel: FeedbackViewModel = viewModel()
+
+    if (enableFeedbackDialog) showFeedbackDialog.value = true
 
     AppScaffold(navController = navController) {
         Box(modifier = Modifier.fillMaxSize()) {
