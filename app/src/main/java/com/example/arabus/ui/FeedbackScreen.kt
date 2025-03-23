@@ -1,50 +1,44 @@
 package com.example.arabus.ui
 
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.TypographyColor
+import com.example.arabus.ui.view.FeedbackViewModel
+import com.example.arabus.core.request.FeedbackRequest
+import androidx.navigation.NavController
 
 @Composable
-fun FeedbackScreen(navController: NavHostController) {
+fun FeedbackScreen(navController: NavHostController, viewModel: FeedbackViewModel = viewModel()) {
     var rating by remember { mutableStateOf(0) }
     var feedbackText by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
+    val isLoading by viewModel.isLoading.collectAsState()
 
     Column(
         modifier = Modifier
@@ -77,26 +71,19 @@ fun FeedbackScreen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            for (i in 1..5) {
-                IconButton(onClick = { rating = i }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Star,
-                        contentDescription = "Estrela $i",
-                        tint = TypographyColor,
-                        modifier = Modifier.size(40.dp)
-                    )
-                    if (i <= rating) {
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = null,
-                            tint = TypographyColor,
-                            modifier = Modifier
-                                .size(40.dp)
-                                .absoluteOffset(x = (-40).dp)
-                        )
-                    }
-                }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            (1..5).forEach { i ->
+                Icon(
+                    imageVector = if (i <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                    contentDescription = "Estrela $i",
+                    tint = if (i <= rating) TypographyColor else TypographyColor.copy(alpha = 0.3f),
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clickable { rating = i }
+                )
             }
         }
 
@@ -137,19 +124,41 @@ fun FeedbackScreen(navController: NavHostController) {
 
         Button(
             onClick = {
-                Toast.makeText(context, "Feedback enviado!", Toast.LENGTH_SHORT).show()
+                val request = FeedbackRequest(
+                    comment = feedbackText.text,
+                    rating = rating
+                )
+                viewModel.createFeedback(request) { success ->
+                    Handler(Looper.getMainLooper()).post {
+                        if (success) {
+                            Toast.makeText(context, "Feedback enviado com sucesso!", Toast.LENGTH_SHORT).show()
+                            feedbackText = TextFieldValue("")
+                            rating = 0
+                            navController.popBackStack()
+                        } else {
+                            Toast.makeText(context, "Erro ao enviar feedback.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = AppGreen),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            enabled = !isLoading
         ) {
-            Text(text = "Publicar Feedback", fontSize = 16.sp, color = Color.White)
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text(text = "Publicar Feedback", fontSize = 16.sp, color = Color.White)
+            }
         }
     }
 }
 
-//@Preview(showBackground = true, showSystemUi = true)
-//@Composable
-//fun PreviewFeedbackScreen() {
-//    FeedbackScreen()
-//}
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewFeedbackScreen() {
+    val navController = rememberNavController()
+    val viewModel: FeedbackViewModel = viewModel()
+    FeedbackScreen(navController = navController, viewModel = viewModel)
+}

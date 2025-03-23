@@ -64,4 +64,9 @@ object UserManager {
         token = null
         user = null
     }
+
+    fun getUserIdAsString(): String {
+        return id?.toString() ?: throw IllegalStateException("Usuário não autenticado")
+    }
+
 }

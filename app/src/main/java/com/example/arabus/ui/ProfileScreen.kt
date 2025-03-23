@@ -175,7 +175,10 @@ fun ProfileButtonsSection(navController: NavHostController, user: User?, onLogou
                 onClick = {
                     when (label) {
                         "Histórico de Corridas" -> navController.navigate("history")
-                        "Feedback" -> navController.navigate(FeedbackScreenPath)
+                        "Feedback" -> navController.navigate(FeedbackScreenPath) {
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                         "Termos de Uso" -> downloadDocument(navController.context, "terms_of_use.pdf")
                         "Logout" -> onLogoutClick()
                         else -> {/* Outras ações */}
