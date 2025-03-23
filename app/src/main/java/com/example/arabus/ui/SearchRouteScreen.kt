@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,17 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.arabus.ViewRouteScreenPath
+import com.example.arabus.components.AppSearchSelect
+import com.example.arabus.components.Street
 import com.example.arabus.ui.components.AppButton
 import com.example.arabus.ui.components.AppOriginToDestination
-import com.example.arabus.ui.components.AppTextField
 import com.example.arabus.ui.theme.AppGreen
 import com.example.arabus.ui.theme.AppWhite
 import com.example.arabus.ui.utils.Permissions
 import com.example.arabus.ui.utils.SharedPreferenceManager
+import com.example.arabus.ui.view.RouteViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -37,13 +38,47 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchRouteScreen(navController: NavHostController) {
+fun SearchRouteScreen(navController: NavHostController){
+    val originFromPreviousScreen = navController.previousBackStackEntry
+        ?.savedStateHandle
+        ?.get<String>("origin") ?: ""
+
+    val routeViewModel: RouteViewModel = viewModel()
+
+    val routes by routeViewModel.routes.collectAsState()
+
     val context = LocalContext.current
     val sharedPreferenceManager = remember { SharedPreferenceManager(context) }
     val isTalkBackEnabled = sharedPreferenceManager.isTalkBackEnabled()
 
-    var origin = remember { mutableStateOf("") }
-    var destination = remember { mutableStateOf("") }
+    val origin = remember { mutableStateOf<Street?>(null) }
+    val destination = remember { mutableStateOf<Street?>(null) }
+
+    LaunchedEffect(Unit) {
+        routeViewModel.loadRoutes()
+    }
+
+    val streetsOrigin = routes
+        .map { route ->
+            Street(
+                name = route.origin.street,
+                latitude = route.origin.latitude.toDouble(),
+                longitude = route.origin.longitude.toDouble()
+            )
+        }
+        .distinctBy { it.name }
+
+    val streetsDestination = routes
+        .filter { it.origin.street == origin.value?.name}
+        .map { route ->
+            Street(
+                name = route.destination.street,
+                latitude = route.destination.latitude.toDouble(),
+                longitude = route.destination.longitude.toDouble()
+            )
+        }
+        .distinctBy { it.name }
+
 
     Scaffold(
         topBar = {
@@ -105,56 +140,21 @@ fun SearchRouteScreen(navController: NavHostController) {
                                 .weight(1f)
                                 .padding(horizontal = 4.dp)
                         ) {
-                            AppTextField(
-                                placeholder = "Seu local",
-                                textState = origin.value,
-                                onValueChange = { origin.value = it },
-                                modifier = Modifier.semantics {
-                                    contentDescription = "Campo de entrada para o local de origem"
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
-                                    )
+                            AppSearchSelect(
+                                items = streetsOrigin,
+                                placeholder = "Origem",
+                                defaultItem = originFromPreviousScreen,
+                                onSelect = { name, lat, lng ->
+                                    origin.value = Street(name, lat, lng)
                                 }
                             )
-                            AppTextField(
-                                placeholder = "Destino",
-                                textState = destination.value,
-                                onValueChange = { destination.value = it },
-                                modifier = Modifier.semantics {
-                                    contentDescription = "Campo de entrada para o destino"
-                                },
-                                trailingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search Icon"
-                                    )
-                                }
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clickable {
-                                    val aux = origin.value
-                                    origin.value = destination.value
-                                    destination.value = aux
 
-                                    if (isTalkBackEnabled) {
-                                        Toast.makeText(
-                                            context,
-                                            "Origem e destino trocados",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+                            AppSearchSelect(
+                                items = streetsDestination,
+                                placeholder = "Destino",
+                                onSelect = { name, lat, lng ->
+                                    destination.value = Street(name, lat, lng)
                                 }
-                                .semantics { contentDescription = "Botão para inverter origem e destino" }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.SwapVert,
-                                contentDescription = "Swap Icon",
-                                tint = AppWhite
                             )
                         }
                     }
@@ -235,8 +235,8 @@ fun GoogleMapComposable() {
     )
 }
 
-@Composable
-@Preview
-private fun Preview() {
-    SearchRouteScreen(navController = NavHostController(LocalContext.current))
-}
+//@Composable
+//@Preview
+//private fun Preview() {
+//    SearchRouteScreen(navController = NavHostController(LocalContext.current))
+//}
