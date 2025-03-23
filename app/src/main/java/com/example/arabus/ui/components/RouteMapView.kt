@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsBus
@@ -29,7 +31,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.arabus.HomeScreenPath
 import com.example.arabus.R
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -47,7 +52,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun RouteMapView(
     startLocation: LatLng,
-    endLocation: LatLng
+    endLocation: LatLng,
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,10 +90,9 @@ fun RouteMapView(
                 remainingDistance = calculateRemainingDistance(busPosition, remainingRoutePoints)
                 remainingTime = calculateRemainingTime(remainingDistance!!)
 
-                // Verificar se chegou ao destino
                 if (isCloseToDestination(busPosition, endLocation)) {
-                    // Mostrar Toast quando o ônibus chegar ao destino
-                    Toast.makeText(context, "Ônibus chegou ao destino", Toast.LENGTH_LONG).show()
+                    navController.currentBackStackEntry?.savedStateHandle?.set("enableFeedbackDialog", true)
+                    navController.navigate(HomeScreenPath)
                     break
                 }
             }
@@ -120,42 +125,53 @@ fun RouteMapView(
 
         estimatedTime?.let { time ->
             distance?.let { dist ->
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(16.dp)
-                        .background(Color.White, RoundedCornerShape(12.dp))
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .background(Color.White, RoundedCornerShape(12.dp))
+                            .padding(12.dp)
+                            .wrapContentSize(Alignment.Center),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.DirectionsBus,
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        Text(
-                            text = "$time | $dist",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-
-                    remainingTime?.let { remainingTime ->
-                        remainingDistance?.let { remainingDist ->
-                            Text(
-                                text = "Faltam: $remainingTime | $remainingDist km",
-                                style = MaterialTheme.typography.bodySmall
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DirectionsBus,
+                                contentDescription = null,
+                                modifier = Modifier.size(24.dp)
                             )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = "$time | $dist",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+
+                        remainingTime?.let { remainingTime ->
+                            remainingDistance?.let { remainingDist ->
+                                Text(
+                                    text = "Faltam: $remainingTime | $remainingDist km",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
     }
 }
 

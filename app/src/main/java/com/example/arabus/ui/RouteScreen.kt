@@ -116,7 +116,7 @@ fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel
                     CircularProgressIndicator()
                 }
             } else {
-                BuildRouteBody(startPosition, endPosition)
+                BuildRouteBody(startPosition, endPosition, navController)
             }
 
             Column(
@@ -145,6 +145,6 @@ fun RouteScreen(navController: NavHostController, routeViewModel: RouteViewModel
 }
 
 @Composable
-private fun BuildRouteBody(startLocation: LatLng, endLocation: LatLng) {
-    Permissions.RequestLocationPermission { RouteMapView(startLocation, endLocation) }
+private fun BuildRouteBody(startLocation: LatLng, endLocation: LatLng,  navController: NavHostController) {
+    Permissions.RequestLocationPermission { RouteMapView(startLocation, endLocation, navController) }
 }
